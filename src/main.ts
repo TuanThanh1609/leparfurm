@@ -1,5 +1,5 @@
 import { PlaywrightCrawler, Dataset } from 'crawlee';
-import { router } from './routes.ts';
+import { router } from './routes';
 import * as dotenv from 'dotenv';
 dotenv.config();
 

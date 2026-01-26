@@ -117,7 +117,7 @@ interface Product {
                     process.stdout.write('.');
 
                 } catch (err) {
-                    console.error(`❌ Error scraping ${productUrl}: ${err}`);
+                    console.error(`❌ Error scraping ${productUrl}: ${err instanceof Error ? err.message : String(err)}`);
                 } finally {
                     await pPage.close();
                 }

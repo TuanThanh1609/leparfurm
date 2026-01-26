@@ -73,8 +73,8 @@ const OUTPUT_FILE = 'products_women.csv';
                     // Remove scripts/styles from desc text
                     if (descEl) {
                         const clones = descEl.cloneNode(true);
-                        const trash = clones.querySelectorAll('script, style');
-                        trash.forEach(t => t.remove());
+                        const trash = (clones as Element).querySelectorAll('script, style');
+                        trash.forEach((t: Element) => t.remove());
                     }
                     const description = descEl ? descEl.textContent?.trim().replace(/\s+/g, ' ') : ''; // Optimize whitespace
 
@@ -91,7 +91,7 @@ const OUTPUT_FILE = 'products_women.csv';
                 process.stdout.write('.');
 
             } catch (err) {
-                console.error(`❌ Error scraping ${productUrl}: ${err.message}`);
+                console.error(`❌ Error scraping ${productUrl}: ${err instanceof Error ? err.message : String(err)}`);
             } finally {
                 await pPage.close();
             }
