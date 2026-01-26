@@ -75,8 +75,23 @@ interface Product {
                     return route.continue();
                 });
 
+                // Helper: Safe Goto with Retry (Playwright Skill Pattern)
+                const safeGoto = async (url: string, retries = 3) => {
+                    for (let i = 0; i < retries; i++) {
+                        try {
+                            await pPage.goto(url, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                            return true;
+                        } catch (e) {
+                            if (i === retries - 1) throw e;
+                            console.log(`      ⚠️ Retry ${i + 1}/${retries} for ${url}`);
+                            await new Promise(r => setTimeout(r, 2000));
+                        }
+                    }
+                    return false;
+                };
+
                 try {
-                    await pPage.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
+                    await safeGoto(productUrl);
 
                     // Allow some time for dynamic content
                     await pPage.waitForTimeout(1000);
