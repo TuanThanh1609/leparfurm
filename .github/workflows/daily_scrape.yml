@@ -29,11 +29,11 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
-      - name: Install tsx (TypeScript executor)
-        run: npm install -g tsx
+      - name: Compile TypeScript
+        run: npx tsc
 
-      - name: Run Full Scraper
-        run: tsx src/full_scraper.ts
+      - name: Run Full Scraper  
+        run: node dist/full_scraper.js
         timeout-minutes: 60
 
       - name: Check for changes
