@@ -66,7 +66,7 @@ interface Product {
 
                 const pPage = await context.newPage();
                 try {
-                    await pPage.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
+                    await pPage.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
 
                     // Allow some time for dynamic content
                     await pPage.waitForTimeout(1000);

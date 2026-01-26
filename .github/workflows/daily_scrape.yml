@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Full Scraper  
         run: node dist/full_scraper.js
-        timeout-minutes: 60
+        timeout-minutes: 120
 
       - name: Check for changes
         id: git-check
