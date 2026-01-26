@@ -65,8 +65,18 @@ interface Product {
                 if (allProducts.some(p => p.link === productUrl)) continue;
 
                 const pPage = await context.newPage();
+
+                // Block heavy resources
+                await pPage.route('**/*', (route) => {
+                    const type = route.request().resourceType();
+                    if (['image', 'stylesheet', 'font', 'media'].includes(type)) {
+                        return route.abort();
+                    }
+                    return route.continue();
+                });
+
                 try {
-                    await pPage.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 15000 });
+                    await pPage.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
 
                     // Allow some time for dynamic content
                     await pPage.waitForTimeout(1000);
