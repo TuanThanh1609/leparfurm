@@ -70,7 +70,7 @@ export async function submitOrder(data: OrderData): Promise<OrderResult> {
         //     method: "POST",
         //     headers: {
         //         "Content-Type": "application/json",
-        //         "xc-token": process.env.NOCODB_API_TOKEN || ""
+        //         "xc-token": import.meta.env.VITE_NOCODB_API_TOKEN || ""
         //     },
         //     body: JSON.stringify(record)
         // });
