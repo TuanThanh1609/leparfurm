@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/Button";
+import { ShoppingBag, ExternalLink } from "lucide-react";
 
 // Matches the JSON structure
 export interface Product {
@@ -116,7 +117,7 @@ export function Results({ matches, onRestart }: ResultsProps) {
                             window.open(url, '_blank');
                         }}
                     >
-                        Mua Ngay
+                        <ShoppingBag size={18} /> Mua Ngay <ExternalLink size={14} className="opacity-50" />
                     </Button>
                     <button onClick={onRestart} className="w-full py-3 text-sm text-brand-dark/40 hover:text-brand-dark transition-colors font-medium">
                         Làm Lại
