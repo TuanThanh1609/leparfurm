@@ -10,6 +10,7 @@ export interface Product {
     image: string;
     description: string;
     tags: string[];
+    link?: string;
 }
 
 interface ResultsProps {
@@ -104,7 +105,15 @@ export function Results({ matches, onRestart }: ResultsProps) {
                 )}
 
                 <div className="mt-auto space-y-3 pt-6">
-                    <Button className="w-full">Mua Ngay</Button>
+                    <Button
+                        className="w-full"
+                        onClick={() => {
+                            const url = winner.link || `https://namperfume.net/products/${winner.id}`;
+                            window.open(url, '_blank');
+                        }}
+                    >
+                        Mua Ngay
+                    </Button>
                     <button onClick={onRestart} className="w-full py-3 text-sm text-brand-dark/40 hover:text-brand-dark transition-colors font-medium">
                         Làm Lại
                     </button>
