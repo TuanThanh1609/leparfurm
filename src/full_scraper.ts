@@ -9,7 +9,7 @@ const CATEGORIES = [
 ];
 
 const MAX_PAGES_PER_CAT = 10; // Safety limit per category
-const MAX_PRODUCTS_TOTAL = 500; // Total limit
+const MAX_PRODUCTS_TOTAL = 1200; // Total limit
 const OUTPUT_CSV = 'products_full.csv';
 const OUTPUT_XML = 'products_feed.xml';
 

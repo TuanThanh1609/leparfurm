@@ -34,7 +34,7 @@ jobs:
 
       - name: Run Full Scraper  
         run: node dist/full_scraper.js
-        timeout-minutes: 120
+        timeout-minutes: 360
 
       - name: Commit and Push Changes
         run: |
