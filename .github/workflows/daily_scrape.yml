@@ -36,16 +36,17 @@ jobs:
         run: node dist/full_scraper.js
         timeout-minutes: 120
 
-      - name: Check for changes
-        id: git-check
-        run: |
-          git diff --exit-code || echo "changes=true" >> $GITHUB_OUTPUT
-
       - name: Commit and Push Changes
-        if: steps.git-check.outputs.changes == 'true'
         run: |
           git config --global user.name 'Antigravity Bot'
           git config --global user.email 'bot@antigravity.ai'
           git add products_full.csv products_feed.xml
-          git commit -m "🤖 Auto-update product feed [$(date)]"
-          git push
+          
+          # Check if there are any changes (staged or modified)
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Changes detected. Committing..."
+            git commit -m "🤖 Auto-update product feed [$(date)]"
+            git push
+          else
+            echo "No changes to commit."
+          fi
