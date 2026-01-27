@@ -89,6 +89,10 @@ export function Results({ matches, onRestart }: ResultsProps) {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.6 + (idx * 0.1) }}
+                                    onClick={() => {
+                                        const url = p.link || `https://namperfume.net/products/${p.id}`;
+                                        window.open(url, '_blank');
+                                    }}
                                     className="bg-white p-3 rounded-2xl flex items-center gap-4 shadow-sm border border-transparent hover:border-brand-gold/30 transition-colors cursor-pointer"
                                 >
                                     <img src={p.image} alt={p.title} className="w-14 h-14 rounded-full object-cover bg-gray-100" />
