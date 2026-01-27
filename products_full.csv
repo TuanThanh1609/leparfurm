@@ -1,0 +1,6 @@
+id,title,description,link,image_link,price,brand,availability,condition,google_product_category
+"blue-chanel","Bleu de Chanel","Fresh citrus and woody scent. Hương gỗ nam tính. Perfect for the gym or office.","https://example.com/blue","https://example.com/blue.jpg","3500000 VND","Chanel","in stock","new","Perfume"
+"dior-sauvage","Dior Sauvage","Spicy and fresh. Hương tiêu cay nồng. Great for parties and date night.","https://example.com/sauvage","https://example.com/sauvage.jpg","3200000 VND","Dior","in stock","new","Perfume"
+"miss-dior","Miss Dior","Sweet floral blooming bouquet. Hương hoa cỏ. Romantic date night.","https://example.com/miss","https://example.com/miss.jpg","2800000 VND","Dior","in stock","new","Perfume"
+"versace-eros","Versace Eros","Minty vanilla, very sexy and loud. Vani ngọt ngào. Party beast.","https://example.com/eros","https://example.com/eros.jpg","2100000 VND","Versace","in stock","new","Perfume"
+"ck-one","CK One","Clean unisex citrus. Cam chanh tươi mát. Relaxing and daily use.","https://example.com/ck","https://example.com/ck.jpg","1500000 VND","Calvin Klein","in stock","new","Perfume"

@@ -1,0 +1,68 @@
+[
+  {
+    "id": "blue-chanel",
+    "title": "Bleu de Chanel",
+    "brand": "Chanel",
+    "price": 3500000,
+    "image": "https://example.com/blue.jpg",
+    "tags": [
+      "Fresh",
+      "Woody",
+      "Classy",
+      "Office"
+    ],
+    "description": "Fresh citrus and woody scent. Hương gỗ nam tính. Perfect for the gym or office...."
+  },
+  {
+    "id": "dior-sauvage",
+    "title": "Dior Sauvage",
+    "brand": "Dior",
+    "price": 3200000,
+    "image": "https://example.com/sauvage.jpg",
+    "tags": [
+      "Fresh",
+      "Spicy",
+      "Classy",
+      "Sexy"
+    ],
+    "description": "Spicy and fresh. Hương tiêu cay nồng. Great for parties and date night...."
+  },
+  {
+    "id": "miss-dior",
+    "title": "Miss Dior",
+    "brand": "Dior",
+    "price": 2800000,
+    "image": "https://example.com/miss.jpg",
+    "tags": [
+      "Floral",
+      "Sweet",
+      "Classy",
+      "Sexy"
+    ],
+    "description": "Sweet floral blooming bouquet. Hương hoa cỏ. Romantic date night...."
+  },
+  {
+    "id": "versace-eros",
+    "title": "Versace Eros",
+    "brand": "Versace",
+    "price": 2100000,
+    "image": "https://example.com/eros.jpg",
+    "tags": [
+      "Sweet",
+      "Sexy"
+    ],
+    "description": "Minty vanilla, very sexy and loud. Vani ngọt ngào. Party beast...."
+  },
+  {
+    "id": "ck-one",
+    "title": "CK One",
+    "brand": "Calvin Klein",
+    "price": 1500000,
+    "image": "https://example.com/ck.jpg",
+    "tags": [
+      "Fresh",
+      "Office"
+    ],
+    "description": "Clean unisex citrus. Cam chanh tươi mát. Relaxing and daily use...."
+  }
+]
