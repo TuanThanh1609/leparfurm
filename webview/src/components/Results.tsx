@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/Button";
-import { ShoppingBag, ExternalLink } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 // Matches the JSON structure
 export interface Product {
@@ -17,9 +17,10 @@ export interface Product {
 interface ResultsProps {
     matches: Product[];
     onRestart: () => void;
+    onBuyNow: (product: Product) => void;
 }
 
-export function Results({ matches, onRestart }: ResultsProps) {
+export function Results({ matches, onRestart, onBuyNow }: ResultsProps) {
     const winner = matches[0];
     const runnersUp = matches.slice(1, 4); // Take up to 3 alternates
 
@@ -90,10 +91,7 @@ export function Results({ matches, onRestart }: ResultsProps) {
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
                                     transition={{ delay: 0.6 + (idx * 0.1) }}
-                                    onClick={() => {
-                                        const url = p.link || `https://namperfume.net/products/${p.id}`;
-                                        window.open(url, '_blank');
-                                    }}
+                                    onClick={() => onBuyNow(p)}
                                     className="bg-white p-3 rounded-2xl flex items-center gap-4 shadow-sm border border-transparent hover:border-brand-gold/30 transition-colors cursor-pointer"
                                 >
                                     <img src={p.image} alt={p.title} className="w-14 h-14 rounded-full object-cover bg-gray-100" />
@@ -112,12 +110,9 @@ export function Results({ matches, onRestart }: ResultsProps) {
                 <div className="mt-auto space-y-3 pt-6">
                     <Button
                         className="w-full"
-                        onClick={() => {
-                            const url = winner.link || `https://namperfume.net/products/${winner.id}`;
-                            window.open(url, '_blank');
-                        }}
+                        onClick={() => onBuyNow(winner)}
                     >
-                        <ShoppingBag size={18} /> Mua Ngay <ExternalLink size={14} className="opacity-50" />
+                        <ShoppingBag size={18} /> Mua Ngay
                     </Button>
                     <button onClick={onRestart} className="w-full py-3 text-sm text-brand-dark/40 hover:text-brand-dark transition-colors font-medium">
                         Làm Lại

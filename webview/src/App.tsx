@@ -4,13 +4,14 @@ import { Layout } from "./components/Layout";
 import { Intro } from "./components/Intro";
 import { QuizCard, type Question } from "./components/QuizCard";
 import { Results, type Product } from "./components/Results";
+import { Checkout } from "./components/Checkout";
 import { getTopMatches } from "./logic/matchmaker";
 import productsData from "./data/products.json";
 
 // Using generic type for imported json to avoid strict check errors
 const ALL_PRODUCTS = productsData as unknown as Product[];
 
-type AppState = "intro" | "quiz" | "results";
+type AppState = "intro" | "quiz" | "results" | "checkout";
 
 const QUESTIONS: Question[] = [
   {
@@ -50,6 +51,7 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [matches, setMatches] = useState<Product[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const startQuiz = () => {
     setView("quiz");
@@ -87,6 +89,20 @@ export default function App() {
 
     setMatches(finalMatches);
     setView("results");
+  };
+
+  const handleBuyNow = (product: Product) => {
+    setSelectedProduct(product);
+    setView("checkout");
+  };
+
+  const handleCheckoutBack = () => {
+    setView("results");
+  };
+
+  const handleCheckoutComplete = () => {
+    setSelectedProduct(null);
+    setView("intro");
   };
 
   return (
@@ -130,7 +146,27 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <Results matches={matches} onRestart={() => setView("intro")} />
+            <Results
+              matches={matches}
+              onRestart={() => setView("intro")}
+              onBuyNow={handleBuyNow}
+            />
+          </motion.div>
+        )}
+
+        {view === "checkout" && selectedProduct && (
+          <motion.div
+            key="checkout"
+            className="w-full h-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Checkout
+              product={selectedProduct}
+              onBack={handleCheckoutBack}
+              onComplete={handleCheckoutComplete}
+            />
           </motion.div>
         )}
       </AnimatePresence>
