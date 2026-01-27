@@ -32,21 +32,21 @@ export function Intro({ onStart }: IntroProps) {
                     className="mb-6"
                 >
                     <span className="inline-block border border-brand-gold/30 rounded-full px-4 py-1 text-xs text-brand-gold uppercase tracking-widest backdrop-blur-sm">
-                        AI Perfume Matchmaker
+                        Tìm Hương Phù Hợp
                     </span>
                 </motion.div>
 
                 <h1 className="text-4xl md:text-5xl font-serif text-white mb-6 leading-[1.1]">
-                    Discover Your <br />
-                    <span className="text-brand-gold italic">Signature</span>
+                    Khám Phá <br />
+                    <span className="text-brand-gold italic">Hương Thơm Của Bạn</span>
                 </h1>
 
                 <p className="text-white/70 text-base md:text-lg mb-10 font-light leading-relaxed max-w-xs mx-auto">
-                    Answer 3 simple questions and let us find the tailored scent for you.
+                    Trả lời 3 câu hỏi đơn giản và để chúng tôi tìm mùi hương phù hợp nhất cho bạn.
                 </p>
 
                 <Button onClick={onStart} className="w-full">
-                    Start the Quiz <ArrowRight size={20} />
+                    Bắt Đầu Ngay <ArrowRight size={20} />
                 </Button>
             </motion.div>
         </div>

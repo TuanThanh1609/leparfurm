@@ -30,7 +30,7 @@ export function QuizCard({ data, totalQuestions, currentStep, onAnswer, onBack }
                     <ArrowLeft size={24} />
                 </button>
                 <span className="text-xs font-bold tracking-widest uppercase text-brand-dark/40">
-                    Step {currentStep} / {totalQuestions}
+                    Câu {currentStep} / {totalQuestions}
                 </span>
                 <div className="w-8" /> {/* Spacer */}
             </div>

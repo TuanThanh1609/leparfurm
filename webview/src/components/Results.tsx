@@ -21,7 +21,7 @@ export function Results({ matches, onRestart }: ResultsProps) {
     const winner = matches[0];
     const runnersUp = matches.slice(1, 4); // Take up to 3 alternates
 
-    if (!winner) return <div>No matches found</div>;
+    if (!winner) return <div>Không tìm thấy sản phẩm phù hợp</div>;
 
     return (
         <div className="w-full h-full flex flex-col bg-brand-cream overflow-y-auto custom-scrollbar">
@@ -38,7 +38,7 @@ export function Results({ matches, onRestart }: ResultsProps) {
                     transition={{ delay: 0.3 }}
                     className="inline-block bg-brand-gold/20 text-brand-gold px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4"
                 >
-                    Your Signature Scent
+                    Hương Thơm Dành Cho Bạn
                 </motion.span>
 
                 <h2 className="text-3xl md:text-4xl font-serif mb-1 leading-none">{winner.title}</h2>
@@ -80,7 +80,7 @@ export function Results({ matches, onRestart }: ResultsProps) {
                 {/* Runners Up */}
                 {runnersUp.length > 0 && (
                     <div className="mb-8">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-4 text-center">Other Great Options</h3>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-4 text-center">Lựa Chọn Khác</h3>
                         <div className="space-y-3">
                             {runnersUp.map((p, idx) => (
                                 <motion.div
@@ -104,9 +104,9 @@ export function Results({ matches, onRestart }: ResultsProps) {
                 )}
 
                 <div className="mt-auto space-y-3 pt-6">
-                    <Button className="w-full">Shop Now</Button>
+                    <Button className="w-full">Mua Ngay</Button>
                     <button onClick={onRestart} className="w-full py-3 text-sm text-brand-dark/40 hover:text-brand-dark transition-colors font-medium">
-                        Start Over
+                        Làm Lại
                     </button>
                 </div>
             </motion.div>

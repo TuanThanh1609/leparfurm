@@ -15,32 +15,32 @@ type AppState = "intro" | "quiz" | "results";
 const QUESTIONS: Question[] = [
   {
     id: 1,
-    question: "Where will you be wearing this scent?",
+    question: "Bạn sẽ dùng nước hoa ở đâu?",
     options: [
-      { label: "Daily / Office", value: "Office" },
-      { label: "Date Night", value: "Sexy" },
-      { label: "Party / Event", value: "Sexy" }, // Using Sexy/Party tags
-      { label: "Gym / Sport", value: "Fresh" },
-      { label: "Relaxing at Home", value: "Sweet" }
+      { label: "Đi làm / Văn phòng", value: "Office" },
+      { label: "Hẹn hò", value: "Sexy" },
+      { label: "Tiệc / Sự kiện", value: "Sexy" },
+      { label: "Gym / Thể thao", value: "Fresh" },
+      { label: "Ở nhà thư giãn", value: "Sweet" }
     ]
   },
   {
     id: 2,
-    question: "What kind of vibe do you prefer?",
+    question: "Bạn thích phong cách nào?",
     options: [
-      { label: "Fresh & Citrusy", value: "Fresh" },
-      { label: "Sweet & Floral", value: "Sweet" },
-      { label: "Woody & Warm", value: "Woody" },
-      { label: "Spicy & Bold", value: "Spicy" }
+      { label: "Tươi mát & Cam chanh", value: "Fresh" },
+      { label: "Ngọt ngào & Hoa cỏ", value: "Sweet" },
+      { label: "Gỗ ấm & Trầm", value: "Woody" },
+      { label: "Cay nồng & Mạnh mẽ", value: "Spicy" }
     ]
   },
   {
     id: 3,
-    question: "What is your budget?",
+    question: "Ngân sách của bạn?",
     options: [
-      { label: "Under 1,000,000 VND", value: "Budget" },
-      { label: "1M - 3M VND", value: "Mid" },
-      { label: "Money is no object", value: "Luxury" }
+      { label: "Dưới 1 triệu VND", value: "Budget" },
+      { label: "1 - 3 triệu VND", value: "Mid" },
+      { label: "Không giới hạn", value: "Luxury" }
     ]
   }
 ];
