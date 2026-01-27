@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Button } from "./ui/Button";
 import { ArrowLeft, ShoppingBag, CheckCircle } from "lucide-react";
 import type { Product } from "./Results";
+import { submitOrder } from "../services/orderApi";
 
 interface CheckoutProps {
     product: Product;
@@ -60,21 +61,24 @@ export function Checkout({ product, onBack, onComplete }: CheckoutProps) {
 
         setIsSubmitting(true);
 
-        // Simulate API call - replace with actual backend integration
         try {
-            // TODO: Send order to backend (Supabase/NocoDB)
-            await new Promise(resolve => setTimeout(resolve, 1500));
-
-            console.log("Order submitted:", {
-                product: {
-                    id: product.id,
-                    title: product.title,
-                    price: product.price
-                },
-                customer: form
+            const result = await submitOrder({
+                productId: product.id,
+                productTitle: product.title,
+                productPrice: product.price,
+                customerName: form.fullName,
+                customerPhone: form.phone,
+                customerEmail: form.email,
+                customerAddress: form.address,
+                note: form.note
             });
 
-            setIsSuccess(true);
+            if (result.success) {
+                console.log("✅ Order submitted:", result.orderCode);
+                setIsSuccess(true);
+            } else {
+                throw new Error(result.error || "Unknown error");
+            }
         } catch (error) {
             console.error("Order failed:", error);
             alert("Có lỗi xảy ra. Vui lòng thử lại!");
