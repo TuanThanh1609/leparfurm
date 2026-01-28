@@ -38,13 +38,9 @@ export async function submitOrder(data: OrderData): Promise<OrderResult> {
         "customer_phone": data.customerPhone,
         "customer_email": data.customerEmail || "",
         "customer_address": data.customerAddress,
-        "total_amount": data.productPrice,
-        "products": JSON.stringify([{
-            id: data.productId,
-            title: data.productTitle,
-            price: data.productPrice,
-            quantity: 1
-        }]),
+        "total_amount": data.productPrice.toString(),
+        "product_name": data.productTitle,
+        "quanlity": "1", // Note the spelling in your NocoDB schema: "quanlity"
         "note": data.note || "",
         "source": "scent-matchmaker-webview"
     };
