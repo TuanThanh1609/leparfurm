@@ -86,14 +86,46 @@ function parseXML(text) {
 
 function normalizePrice(priceStr) {
     if (!priceStr) return 0;
-    // Handle "1.200.000 VND" or "1200000" or "0 VND"
-    // Remove " VND", remove dots/commas if they are thousands separators
-    // Heuristic: if it contains "VND", strip it.
     let clean = priceStr.replace(/\s?VND/i, '').trim();
-    // If it has dots as thousands separators (common in VN), remove them
-    // But be careful of decimals. Usually VND doesn't have decimals.
     clean = clean.replace(/\./g, '').replace(/,/g, '');
     return parseInt(clean, 10) || 0;
+}
+
+function parseDescriptionAttributes(text) {
+    if (!text) return {};
+
+    const extract = (regex) => {
+        const match = text.match(regex);
+        return match ? match[1].trim() : null;
+    };
+
+    // Extract basic info
+    const origin = extract(/Xuất xứ\s+([^\n]+?)(?=\s+(?:Năm phát hành|Nhóm hương|Phong cách|Mã hàng)|$)/i);
+    const year = extract(/Năm phát hành\s+(\d{4})/i);
+    const style = extract(/Phong cách\s+([^\n]+?)(?=\s+(?:Hương|Nốt|Chưa|$)|$)/i);
+    const other_desc = extract(/(?:Chưa có mô tả|Mô tả sản phẩm)([\s\S]*)/i);
+
+    // Extract notes (handle variations like "Hương đầu:", "Nốt hương đầu :")
+    const topNotes = extract(/(?:Hương đầu|Nốt hương đầu)\s*[:]\s*([^\.]+?)(?=\.|Hương giữa|Nốt hương giữa|$)/i);
+    const middleNotes = extract(/(?:Hương giữa|Nốt hương giữa)\s*[:]\s*([^\.]+?)(?=\.|Hương cuối|Nốt hương cuối|$)/i);
+    const baseNotes = extract(/(?:Hương cuối|Nốt hương cuối)\s*[:]\s*([^\.]+?)(?=\.|$|Mô tả)/i);
+
+    // Extract Group for tags
+    const group = extract(/Nhóm hương\s+([^\n]+?)(?=\s+(?:Phong cách|Hương|$)|$)/i);
+    let tags = [];
+    if (group) {
+        tags = group.split(/,|;/).map(t => t.trim()).filter(t => t);
+    }
+
+    return {
+        origin,
+        year,
+        style,
+        top_notes: topNotes,
+        middle_notes: middleNotes,
+        base_notes: baseNotes,
+        tags
+    };
 }
 
 // --- Main ---
@@ -125,16 +157,24 @@ try {
 
         const priceRaw = row[h['price']];
         const price = normalizePrice(priceRaw);
+        const description = row[h['description']]?.trim() || '';
+        const attributes = parseDescriptionAttributes(description);
 
         products.set(id, {
             id: id,
             title: row[h['title']]?.trim(),
-            description: row[h['description']]?.trim(),
+            description: description,
             brand: row[h['brand']]?.trim() || 'Unknown',
             price: price,
             image: row[h['image_link']]?.trim(),
             link: row[h['link']]?.trim(),
-            tags: [], // Initialize tags
+            tags: attributes.tags || [],
+            origin: attributes.origin,
+            year: attributes.year,
+            style: attributes.style,
+            top_notes: attributes.top_notes,
+            middle_notes: attributes.middle_notes,
+            base_notes: attributes.base_notes,
             source: 'csv'
         });
         csvCount++;
@@ -160,6 +200,15 @@ try {
             // Prefer longer description
             if (item.description && item.description.length > (existing.description?.length || 0)) {
                 existing.description = item.description;
+                // Re-parse attributes if description changes
+                const newAttrs = parseDescriptionAttributes(item.description);
+                existing.tags = newAttrs.tags.length > 0 ? newAttrs.tags : existing.tags;
+                existing.origin = newAttrs.origin || existing.origin;
+                existing.year = newAttrs.year || existing.year;
+                existing.style = newAttrs.style || existing.style;
+                existing.top_notes = newAttrs.top_notes || existing.top_notes;
+                existing.middle_notes = newAttrs.middle_notes || existing.middle_notes;
+                existing.base_notes = newAttrs.base_notes || existing.base_notes;
             }
             // Prefer non-zero price (if CSV was 0)
             if (existing.price === 0 && xmlPrice > 0) {
@@ -172,6 +221,7 @@ try {
             mixedCount++;
         } else {
             // New product from XML
+            const xmlAttrs = parseDescriptionAttributes(item.description);
             products.set(item.id, {
                 id: item.id,
                 title: item.title,
@@ -180,7 +230,13 @@ try {
                 price: xmlPrice,
                 image: item.image_link,
                 link: item.link,
-                tags: [],
+                tags: xmlAttrs.tags || [],
+                origin: xmlAttrs.origin,
+                year: xmlAttrs.year,
+                style: xmlAttrs.style,
+                top_notes: xmlAttrs.top_notes,
+                middle_notes: xmlAttrs.middle_notes,
+                base_notes: xmlAttrs.base_notes,
                 source: 'xml'
             });
             newFromXml++;

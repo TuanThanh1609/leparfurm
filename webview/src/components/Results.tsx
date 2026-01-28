@@ -12,6 +12,12 @@ export interface Product {
     description: string;
     tags: string[];
     link?: string;
+    origin?: string;
+    year?: string;
+    style?: string;
+    top_notes?: string;
+    middle_notes?: string;
+    base_notes?: string;
 }
 
 interface ResultsProps {
@@ -84,17 +90,85 @@ export function Results({ matches, onRestart, onBuyNow }: ResultsProps) {
 
                         <div className="mb-8">
                             <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-2">Mô Tả Sản Phẩm</h3>
-                            <div className="text-brand-dark/80 text-sm leading-relaxed font-light px-4 whitespace-pre-line text-justify">
+                            <div className="text-brand-dark/80 text-sm leading-relaxed font-light px-4 whitespace-pre-line text-justify mb-6">
                                 {winner.description && winner.description !== winner.title && winner.description.length > 20
                                     ? winner.description
                                     : `Khám phá vẻ đẹp tinh tế của ${winner.title}. Một sáng tạo độc đáo từ thương hiệu ${winner.brand}, mang đến cho bạn những tầng hương quyến rũ và phong cách thời thượng.`
                                 }
                             </div>
 
+                            {/* Product Attributes Grid */}
+                            {(winner.origin || winner.year || winner.style) && (
+                                <div className="grid grid-cols-2 gap-4 mb-6 text-left px-4">
+                                    {winner.origin && (
+                                        <div className="bg-white/50 p-2 rounded-lg border border-brand-green/5">
+                                            <span className="block text-[10px] uppercase text-brand-dark/40 font-bold">Xuất Xứ</span>
+                                            <span className="text-sm text-brand-green font-medium">{winner.origin}</span>
+                                        </div>
+                                    )}
+                                    {winner.year && (
+                                        <div className="bg-white/50 p-2 rounded-lg border border-brand-green/5">
+                                            <span className="block text-[10px] uppercase text-brand-dark/40 font-bold">Năm Phát Hành</span>
+                                            <span className="text-sm text-brand-green font-medium">{winner.year}</span>
+                                        </div>
+                                    )}
+                                    {winner.style && (
+                                        <div className="col-span-2 bg-white/50 p-2 rounded-lg border border-brand-green/5">
+                                            <span className="block text-[10px] uppercase text-brand-dark/40 font-bold">Phong Cách</span>
+                                            <span className="text-sm text-brand-green font-medium">{winner.style}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Fragrance Pyramid */}
+                            {(winner.top_notes || winner.middle_notes || winner.base_notes) && (
+                                <div className="mb-6 px-4 text-left">
+                                    <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-3 text-center">Tầng Hương</h3>
+                                    <div className="space-y-3 relative">
+                                        <div className="absolute left-[7px] top-2 bottom-2 w-[1px] bg-brand-gold/30"></div>
+
+                                        {winner.top_notes && (
+                                            <div className="flex items-start gap-3 relative">
+                                                <div className="w-4 h-4 rounded-full bg-brand-gold/20 flex items-center justify-center shrink-0 z-10 border border-brand-gold/50">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-brand-gold"></div>
+                                                </div>
+                                                <div>
+                                                    <span className="block text-[10px] uppercase text-brand-dark/40 font-bold">Hương Đầu</span>
+                                                    <span className="text-sm text-brand-dark/80">{winner.top_notes}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {winner.middle_notes && (
+                                            <div className="flex items-start gap-3 relative">
+                                                <div className="w-4 h-4 rounded-full bg-brand-green/20 flex items-center justify-center shrink-0 z-10 border border-brand-green/50">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-brand-green"></div>
+                                                </div>
+                                                <div>
+                                                    <span className="block text-[10px] uppercase text-brand-dark/40 font-bold">Hương Giữa</span>
+                                                    <span className="text-sm text-brand-dark/80">{winner.middle_notes}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                        {winner.base_notes && (
+                                            <div className="flex items-start gap-3 relative">
+                                                <div className="w-4 h-4 rounded-full bg-brand-dark/10 flex items-center justify-center shrink-0 z-10 border border-brand-dark/30">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-brand-dark"></div>
+                                                </div>
+                                                <div>
+                                                    <span className="block text-[10px] uppercase text-brand-dark/40 font-bold">Hương Cuối</span>
+                                                    <span className="text-sm text-brand-dark/80">{winner.base_notes}</span>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="mt-4 flex flex-col gap-2">
-                                <div className="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Hương đặc trưng</div>
+                                <div className="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Hương Đặc Trưng (Tags)</div>
                                 <div className="flex justify-center gap-2 flex-wrap">
-                                    {winner.tags.length > 0 ? winner.tags.map((tag) => (
+                                    {winner.tags && winner.tags.length > 0 ? winner.tags.map((tag) => (
                                         <span key={tag} className="px-3 py-1 bg-brand-green/5 text-brand-green text-[10px] rounded-full font-medium border border-brand-green/10">
                                             {tag}
                                         </span>
