@@ -1,8 +1,7 @@
 // NocoDB API service for saving orders
 // Note: In production, API calls should go through a backend proxy to hide API keys
 
-// TODO: Enable when API token is configured
-// const NOCODB_API_URL = "https://cloud.nocodb.com/api/v2/tables/mi3jks9a3uqy7wr/records";
+const NOCODB_API_URL = "https://cloud.nocodb.com/api/v2/tables/mi3jks9a3uqy7wr/records";
 
 // Generate unique order code
 function generateOrderCode(): string {
@@ -62,25 +61,19 @@ export async function submitOrder(data: OrderData): Promise<OrderResult> {
     };
 
     try {
-        // For demo/development: Log the order (actual API requires auth token)
-        console.log("📦 Order to submit:", record);
+        const response = await fetch(NOCODB_API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "xc-token": import.meta.env.VITE_NOCODB_API_TOKEN || ""
+            },
+            body: JSON.stringify(record)
+        });
 
-        // TODO: Uncomment when API token is configured
-        // const response = await fetch(NOCODB_API_URL, {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //         "xc-token": import.meta.env.VITE_NOCODB_API_TOKEN || ""
-        //     },
-        //     body: JSON.stringify(record)
-        // });
-
-        // if (!response.ok) {
-        //     throw new Error(`API error: ${response.status}`);
-        // }
-
-        // Simulate success for now
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API error (${response.status}): ${errorText}`);
+        }
 
         return {
             success: true,
