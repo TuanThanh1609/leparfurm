@@ -132,75 +132,103 @@ function parseDescriptionAttributes(text) {
 
 try {
     console.log('Reading source files...');
-    const csvContent = fs.readFileSync(csvPath, 'utf8');
-    const xmlContent = fs.readFileSync(xmlPath, 'utf8');
+    // Load backup for prices/images
+    let products = new Map();
+    const backupPath = path.join(rootDir, 'products_backup.json');
+    if (fs.existsSync(backupPath)) {
+        // Strip BOM if present
+        const content = fs.readFileSync(backupPath, 'utf-8').replace(/^\uFEFF/, '');
+        const backupData = JSON.parse(content);
+        console.log(`Loaded ${backupData.length} products from backup (Source of Truth for Price/Image).`);
+        backupData.forEach(p => {
+            // Ensure numeric price
+            p.price = typeof p.price === 'string' ? normalizePrice(p.price) : p.price;
+            products.set(p.id, { ...p, source: 'backup' });
+        });
+    }
 
+    // CSV for Description & Attributes
     console.log('Parsing CSV...');
-    const csvRows = parseCSV(csvContent);
-    const csvHeaders = csvRows[0].map(h => h.trim().toLowerCase());
+    const csvContent = fs.readFileSync(path.join(rootDir, 'products_full.csv'), 'utf-8');
+    const { headers, data: csvData } = parseCSV(csvContent);
+    const h = headers;
+    let updatedCount = 0;
+    let newFromCsv = 0;
 
-    // Map CSV headers to indices
-    const h = {};
-    csvHeaders.forEach((header, idx) => { h[header] = idx; });
-
-    const products = new Map();
-
-    // Process CSV first
     console.log('Processing CSV data...');
-    let csvCount = 0;
-    for (let i = 1; i < csvRows.length; i++) {
-        const row = csvRows[i];
-        if (row.length < 2) continue; // Skip empty rows
+    csvData.forEach(row => {
+        const id = row[h['handle']]?.trim();
+        if (!id) return;
 
-        const id = row[h['id']]?.trim();
-        if (!id) continue;
-
-        const priceRaw = row[h['price']];
-        const price = normalizePrice(priceRaw);
         const description = row[h['description']]?.trim() || '';
         const attributes = parseDescriptionAttributes(description);
 
-        products.set(id, {
-            id: id,
-            title: row[h['title']]?.trim(),
-            description: description,
-            brand: row[h['brand']]?.trim() || 'Unknown',
-            price: price,
-            image: row[h['image_link']]?.trim(),
-            link: row[h['link']]?.trim(),
-            tags: attributes.tags || [],
-            origin: attributes.origin,
-            year: attributes.year,
-            style: attributes.style,
-            top_notes: attributes.top_notes,
-            middle_notes: attributes.middle_notes,
-            base_notes: attributes.base_notes,
-            source: 'csv'
-        });
-        csvCount++;
-    }
-    console.log(`Loaded ${csvCount} products from CSV.`);
+        // If product exists in backup, ONLY update description and attributes
+        if (products.has(id)) {
+            const existing = products.get(id);
+            existing.description = description;
+            existing.tags = attributes.tags || [];
+            existing.origin = attributes.origin;
+            existing.year = attributes.year;
+            existing.style = attributes.style;
+            existing.top_notes = attributes.top_notes;
+            existing.middle_notes = attributes.middle_notes;
+            existing.base_notes = attributes.base_notes;
+            updatedCount++;
+        } else {
+            // New product from CSV (might have bad price/image, but better than nothing)
+            const priceRaw = row[h['price']];
+            const price = normalizePrice(priceRaw);
 
-    // Process XML
+            // Detect placeholder image
+            let image = row[h['image_link']]?.trim();
+            if (image && image.includes('icon-ring.svg')) {
+                image = ''; // Treat as empty so XML can fill it
+            }
+
+            products.set(id, {
+                id: id,
+                title: row[h['title']]?.trim(),
+                description: description,
+                brand: row[h['brand']]?.trim() || 'Unknown',
+                price: price,
+                image: image,
+                link: row[h['link']]?.trim(),
+                tags: attributes.tags || [],
+                origin: attributes.origin,
+                year: attributes.year,
+                style: attributes.style,
+                top_notes: attributes.top_notes,
+                middle_notes: attributes.middle_notes,
+                base_notes: attributes.base_notes,
+                source: 'csv'
+            });
+            newFromCsv++;
+        }
+    });
+
+    console.log(`Updated details for ${updatedCount} products from backup.`);
+    console.log(`Added ${newFromCsv} new products from CSV.`);
+
+    // Optional: Parse XML if we want to cross-check or find more products
+    // For now, let's assume CSV + Backup is enough. 
+    // But if you want to merge XML, we can do it similarly.
     console.log('Parsing XML...');
-    const xmlItems = parseXML(xmlContent);
-    console.log(`Found ${xmlItems.length} items in XML.`);
+    const xmlData = parseXML(fs.readFileSync(path.join(rootDir, 'products_feed.xml'), 'utf-8'));
+    console.log(`Found ${xmlData.length} items in XML.`);
 
     let mixedCount = 0;
     let newFromXml = 0;
 
-    xmlItems.forEach(item => {
-        if (!item.id) return;
-
+    // Merge XML (Lower priority than CSV for description, but checks for new items)
+    xmlData.forEach(item => {
         const existing = products.get(item.id);
         const xmlPrice = normalizePrice(item.price);
 
         if (existing) {
-            // MERGE POLICY
-            // Prefer longer description
-            if (item.description && item.description.length > (existing.description?.length || 0)) {
+            // Only update if existing description is empty and XML has one
+            if ((!existing.description || existing.description.length < 20) && item.description && item.description.length > 20) {
                 existing.description = item.description;
-                // Re-parse attributes if description changes
                 const newAttrs = parseDescriptionAttributes(item.description);
                 existing.tags = newAttrs.tags.length > 0 ? newAttrs.tags : existing.tags;
                 existing.origin = newAttrs.origin || existing.origin;
@@ -210,12 +238,12 @@ try {
                 existing.middle_notes = newAttrs.middle_notes || existing.middle_notes;
                 existing.base_notes = newAttrs.base_notes || existing.base_notes;
             }
-            // Prefer non-zero price (if CSV was 0)
+            // If backup had price 0 (rare) and XML has price, use it? likely backup is good.
             if (existing.price === 0 && xmlPrice > 0) {
                 existing.price = xmlPrice;
             }
-            // Prefer XML image if CSV image is missing
-            if (!existing.image && item.image_link) {
+            // Prefer XML image if CSV/Backup image is missing or placeholder
+            if ((!existing.image || existing.image.includes('icon-ring.svg')) && item.image_link && !item.image_link.includes('icon-ring.svg')) {
                 existing.image = item.image_link;
             }
             mixedCount++;
