@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Layout } from "./components/Layout";
 import { Intro } from "./components/Intro";
@@ -6,10 +6,11 @@ import { QuizCard, type Question } from "./components/QuizCard";
 import { Results, type Product } from "./components/Results";
 import { Checkout } from "./components/Checkout";
 import { getTopMatches } from "./logic/matchmaker";
-import productsData from "./data/products.json";
+import { fetchProducts } from "./services/productApi";
+import staticProductsData from "./data/products.json";
 
-// Using generic type for imported json to avoid strict check errors
-const ALL_PRODUCTS = productsData as unknown as Product[];
+// Fallback static products
+const STATIC_PRODUCTS = staticProductsData as unknown as Product[];
 
 type AppState = "intro" | "quiz" | "results" | "checkout";
 
@@ -52,6 +53,25 @@ export default function App() {
   const [answers, setAnswers] = useState<string[]>([]);
   const [matches, setMatches] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [allProducts, setAllProducts] = useState<Product[]>(STATIC_PRODUCTS);
+
+  // Fetch products from NocoDB on mount
+  useEffect(() => {
+    const loadProducts = async () => {
+      const result = await fetchProducts();
+
+      if (result.success && result.products.length > 0) {
+        console.log("📦 Using NocoDB products:", result.products.length);
+        setAllProducts(result.products);
+      } else {
+        console.log("📦 Using static products:", STATIC_PRODUCTS.length);
+        setAllProducts(STATIC_PRODUCTS);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
 
   const startQuiz = () => {
     setView("quiz");
@@ -82,10 +102,10 @@ export default function App() {
 
   const calculateMatches = (userAnswers: string[]) => {
     // Use real matchmaker algorithm from Phase 4
-    const topProducts = getTopMatches(userAnswers, ALL_PRODUCTS, 5);
+    const topProducts = getTopMatches(userAnswers, allProducts, 5);
 
     // Fallback if no match
-    const finalMatches = topProducts.length > 0 ? topProducts : ALL_PRODUCTS.slice(0, 3);
+    const finalMatches = topProducts.length > 0 ? topProducts : allProducts.slice(0, 3);
 
     setMatches(finalMatches);
     setView("results");

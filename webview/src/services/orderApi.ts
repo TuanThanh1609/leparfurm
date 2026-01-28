@@ -1,7 +1,7 @@
 // NocoDB API service for saving orders
-// Note: In production, API calls should go through a backend proxy to hide API keys
+// Endpoint: nocodb.smax.in - Order Table: m4fnwlzh8a3j5ne
 
-const NOCODB_API_URL = "https://cloud.nocodb.com/api/v2/tables/mi3jks9a3uqy7wr/records";
+const NOCODB_API_URL = "https://nocodb.smax.in/api/v2/tables/m4fnwlzh8a3j5ne/records";
 
 // Generate unique order code
 function generateOrderCode(): string {
@@ -30,34 +30,23 @@ export interface OrderResult {
 export async function submitOrder(data: OrderData): Promise<OrderResult> {
     const orderCode = generateOrderCode();
 
+    // Map to NocoDB table fields (m4fnwlzh8a3j5ne schema)
     const record = {
-        "ID": orderCode,
-        "Code": orderCode,
-        "Status": "new",
-        "Status Name": "Đơn mới",
-        "Customer Name": data.customerName,
-        "Customer Phone": data.customerPhone,
-        "Total Amount": data.productPrice,
-        "Created At": new Date().toISOString(),
-        "Branch Name": "Le Parfum Webview",
-        "Sales Channel": "Scent Matchmaker",
-        "Products": JSON.stringify([{
+        "order_id": orderCode,
+        "order_status": "new",
+        "customer_name": data.customerName,
+        "customer_phone": data.customerPhone,
+        "customer_email": data.customerEmail || "",
+        "customer_address": data.customerAddress,
+        "total_amount": data.productPrice,
+        "products": JSON.stringify([{
             id: data.productId,
             title: data.productTitle,
             price: data.productPrice,
             quantity: 1
         }]),
-        "Raw Data": JSON.stringify({
-            customer: {
-                name: data.customerName,
-                phone: data.customerPhone,
-                email: data.customerEmail || "",
-                address: data.customerAddress
-            },
-            note: data.note || "",
-            source: "scent-matchmaker-webview",
-            createdAt: new Date().toISOString()
-        })
+        "note": data.note || "",
+        "source": "scent-matchmaker-webview"
     };
 
     try {
@@ -72,7 +61,8 @@ export async function submitOrder(data: OrderData): Promise<OrderResult> {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`API error (${response.status}): ${errorText}`);
+            console.error("NocoDB Error:", errorText);
+            throw new Error(`Lỗi server (${response.status})`);
         }
 
         return {
@@ -83,7 +73,7 @@ export async function submitOrder(data: OrderData): Promise<OrderResult> {
         console.error("Failed to submit order:", error);
         return {
             success: false,
-            error: error instanceof Error ? error.message : "Unknown error"
+            error: error instanceof Error ? error.message : "Lỗi không xác định"
         };
     }
 }
