@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "./ui/Button";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
 
 // Matches the JSON structure
 export interface Product {
@@ -22,103 +22,148 @@ interface ResultsProps {
 
 export function Results({ matches, onRestart, onBuyNow }: ResultsProps) {
     const winner = matches[0];
-    const runnersUp = matches.slice(1, 4); // Take up to 3 alternates
+    const runnersUp = matches.slice(1, 5); // Take up to 4 alternates
 
     if (!winner) return <div>Không tìm thấy sản phẩm phù hợp</div>;
 
+    // Helper to format currency
+    const formatPrice = (price: number) =>
+        new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+
     return (
-        <div className="w-full h-full flex flex-col bg-brand-cream overflow-y-auto custom-scrollbar">
-            {/* Hero Section */}
-            <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className="bg-brand-green text-white p-8 pt-16 rounded-b-[3rem] relative shadow-2xl z-10 text-center"
-            >
-                <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="inline-block bg-brand-gold/20 text-brand-gold px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-4"
+        <div className="w-full h-full flex flex-col bg-brand-cream overflow-y-auto custom-scrollbar relative">
+            {/* Background Decoration */}
+            <div className="absolute top-0 left-0 w-full h-96 bg-gradient-to-b from-brand-green/10 to-transparent pointer-events-none" />
+            <div className="absolute -top-20 -right-20 w-64 h-64 bg-brand-gold/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Main Result Section */}
+            <div className="px-6 pt-12 pb-6 relative z-10">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6 }}
+                    className="relative"
                 >
-                    Hương Thơm Dành Cho Bạn
-                </motion.span>
+                    {/* Badge */}
+                    <motion.div
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.5, type: 'spring' }}
+                        className="absolute top-0 right-0 z-20 bg-brand-gold text-white px-3 py-1 rounded-full flex items-center gap-1 shadow-lg transform -translate-y-1/2 translate-x-2"
+                    >
+                        <Sparkles size={14} fill="currentColor" />
+                        <span className="text-xs font-bold tracking-wider uppercase">Perfect Match</span>
+                    </motion.div>
 
-                <h2 className="text-3xl md:text-4xl font-serif mb-1 leading-none">{winner.title}</h2>
-                <p className="opacity-70 text-sm font-sans tracking-wide">{winner.brand}</p>
+                    {/* Main Card */}
+                    <div className="bg-white/80 backdrop-blur-md rounded-[2.5rem] p-6 shadow-xl border border-white/50 text-center overflow-hidden relative">
+                        {/* Shimmer Effect */}
+                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-brand-gold/50 to-transparent opacity-50" />
 
-                <div className="mt-8 mb-[-3rem] relative inline-block">
-                    <div className="absolute inset-0 bg-brand-gold blur-2xl opacity-40 animate-pulse" />
-                    <img
-                        src={winner.image}
-                        alt={winner.title}
-                        className="w-48 h-48 md:w-56 md:h-56 object-cover rounded-full border-4 border-white shadow-2xl relative z-10 bg-white"
-                    />
-                </div>
-            </motion.div>
+                        <div className="mb-6 relative inline-block group cursor-pointer" onClick={() => onBuyNow(winner)}>
+                            <div className="absolute inset-0 bg-brand-green/5 rounded-full blur-xl group-hover:bg-brand-gold/20 transition-colors duration-500" />
+                            <motion.img
+                                src={winner.image}
+                                alt={winner.title}
+                                whileHover={{ scale: 1.05, rotate: 2 }}
+                                transition={{ type: "spring", stiffness: 300 }}
+                                className="w-48 h-48 md:w-64 md:h-64 object-cover object-center rounded-full shadow-2xl relative z-10 border-4 border-white bg-white mx-auto"
+                            />
+                        </div>
 
-            {/* Details Section */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="px-6 pt-16 pb-8 flex-1 flex flex-col"
-            >
-                <div className="text-center mb-10 mt-4">
-                    <p className="text-brand-green font-serif text-2xl mb-3">
-                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(winner.price)}
-                    </p>
-                    <p className="text-brand-dark/70 text-sm leading-relaxed max-w-xs mx-auto font-light">
-                        {winner.description}
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2 justify-center">
-                        {winner.tags.slice(0, 3).map(tag => (
-                            <span key={tag} className="text-[10px] border border-brand-dark/20 px-2 py-0.5 rounded-full text-brand-dark/60">
-                                {tag}
-                            </span>
+                        <motion.h2
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="text-2xl md:text-3xl font-serif text-brand-green mb-1 leading-tight"
+                        >
+                            {winner.title}
+                        </motion.h2>
+
+                        <p className="text-sm font-sans text-brand-dark/50 tracking-widest uppercase mb-4">{winner.brand}</p>
+
+                        <div className="flex justify-center gap-2 flex-wrap mb-6">
+                            {winner.tags.slice(0, 4).map((tag, i) => (
+                                <motion.span
+                                    key={tag}
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ delay: 0.4 + (i * 0.1) }}
+                                    className="px-3 py-1 bg-brand-green/5 text-brand-green text-[10px] rounded-full font-medium border border-brand-green/10"
+                                >
+                                    {tag}
+                                </motion.span>
+                            ))}
+                        </div>
+
+                        <p className="text-brand-dark/70 text-sm leading-relaxed mb-6 font-light italic px-4">
+                            "{winner.description}"
+                        </p>
+
+                        <div className="flex items-center justify-between bg-brand-cream/50 rounded-2xl p-4 border border-brand-green/5">
+                            <div className="text-left">
+                                <span className="block text-brand-dark/40 text-[10px] uppercase tracking-wider font-bold">Giá bán</span>
+                                <span className="text-xl font-serif text-brand-green font-bold">
+                                    {formatPrice(winner.price)}
+                                </span>
+                            </div>
+                            <Button className="px-6 shadow-brand-gold/30 shadow-lg" onClick={() => onBuyNow(winner)}>
+                                Mua Ngay <ArrowRight size={16} className="ml-1" />
+                            </Button>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* Runners Up Section */}
+            {runnersUp.length > 0 && (
+                <div className="px-6 pb-24">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="h-[1px] bg-brand-dark/10 flex-1" />
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/40">Gợi Ý Khác</h3>
+                        <div className="h-[1px] bg-brand-dark/10 flex-1" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        {runnersUp.map((p, idx) => (
+                            <motion.div
+                                key={p.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.6 + (idx * 0.1) }}
+                                onClick={() => onBuyNow(p)}
+                                className="bg-white rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 border border-transparent hover:border-brand-gold/30 cursor-pointer group flex flex-col"
+                            >
+                                <div className="relative mb-3 aspect-square rounded-xl overflow-hidden bg-brand-cream ring-1 ring-black/5">
+                                    <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur rounded-full p-1 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <ShoppingBag size={12} className="text-brand-green" />
+                                    </div>
+                                </div>
+
+                                <h4 className="font-serif text-brand-dark text-sm truncate mb-1 group-hover:text-brand-green transition-colors">{p.title}</h4>
+                                <p className="text-[10px] text-brand-dark/50 mb-2 truncate">{p.brand}</p>
+                                <p className="text-xs text-brand-gold font-bold mt-auto">
+                                    {formatPrice(p.price)}
+                                </p>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
+            )}
 
-                {/* Runners Up */}
-                {runnersUp.length > 0 && (
-                    <div className="mb-8">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-4 text-center">Lựa Chọn Khác</h3>
-                        <div className="space-y-3">
-                            {runnersUp.map((p, idx) => (
-                                <motion.div
-                                    key={p.id}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.6 + (idx * 0.1) }}
-                                    onClick={() => onBuyNow(p)}
-                                    className="bg-white p-3 rounded-2xl flex items-center gap-4 shadow-sm border border-transparent hover:border-brand-gold/30 transition-colors cursor-pointer"
-                                >
-                                    <img src={p.image} alt={p.title} className="w-14 h-14 rounded-full object-cover bg-gray-100" />
-                                    <div className="flex-1 min-w-0">
-                                        <h4 className="font-serif text-brand-dark text-base truncate">{p.title}</h4>
-                                        <p className="text-xs text-brand-green font-medium">
-                                            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}
-                                        </p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                <div className="mt-auto space-y-3 pt-6">
-                    <Button
-                        className="w-full"
-                        onClick={() => onBuyNow(winner)}
-                    >
-                        <ShoppingBag size={18} /> Mua Ngay
-                    </Button>
-                    <button onClick={onRestart} className="w-full py-3 text-sm text-brand-dark/40 hover:text-brand-dark transition-colors font-medium">
-                        Làm Lại
-                    </button>
-                </div>
-            </motion.div>
+            {/* Floating Action Bar (Sticky Bottom) - Mobile friendly */}
+            <div className="fixed bottom-6 left-6 right-6 z-30 md:static md:p-6 md:bg-transparent">
+                <motion.button
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 1 }}
+                    onClick={onRestart}
+                    className="w-full bg-white/90 backdrop-blur-md shadow-xl text-brand-dark/60 hover:text-brand-dark py-3 rounded-2xl text-sm font-medium border border-white/50 transition-colors"
+                >
+                    Thử lại bài trắc nghiệm
+                </motion.button>
+            </div>
         </div>
     );
 }
