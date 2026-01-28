@@ -82,23 +82,28 @@ export function Results({ matches, onRestart, onBuyNow }: ResultsProps) {
 
                         <p className="text-sm font-sans text-brand-dark/50 tracking-widest uppercase mb-4">{winner.brand}</p>
 
-                        <div className="flex justify-center gap-2 flex-wrap mb-6">
-                            {winner.tags.slice(0, 4).map((tag, i) => (
-                                <motion.span
-                                    key={tag}
-                                    initial={{ opacity: 0, scale: 0.8 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    transition={{ delay: 0.4 + (i * 0.1) }}
-                                    className="px-3 py-1 bg-brand-green/5 text-brand-green text-[10px] rounded-full font-medium border border-brand-green/10"
-                                >
-                                    {tag}
-                                </motion.span>
-                            ))}
-                        </div>
+                        <div className="mb-8">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-2">Mô Tả Sản Phẩm</h3>
+                            <p className="text-brand-dark/80 text-sm leading-relaxed font-light italic px-4">
+                                {winner.description && winner.description !== winner.title && winner.description.length > 20
+                                    ? winner.description
+                                    : `Khám phá vẻ đẹp tinh tế của ${winner.title}. Một sáng tạo độc đáo từ thương hiệu ${winner.brand}, mang đến cho bạn những tầng hương quyến rũ và phong cách thời thượng.`
+                                }
+                            </p>
 
-                        <p className="text-brand-dark/70 text-sm leading-relaxed mb-6 font-light italic px-4">
-                            "{winner.description}"
-                        </p>
+                            <div className="mt-4 flex flex-col gap-2">
+                                <div className="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Hương đặc trưng</div>
+                                <div className="flex justify-center gap-2 flex-wrap">
+                                    {winner.tags.length > 0 ? winner.tags.map((tag) => (
+                                        <span key={tag} className="px-3 py-1 bg-brand-green/5 text-brand-green text-[10px] rounded-full font-medium border border-brand-green/10">
+                                            {tag}
+                                        </span>
+                                    )) : (
+                                        <span className="text-xs text-brand-dark/50 italic">Đang cập nhật...</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
 
                         <div className="flex items-center justify-between bg-brand-cream/50 rounded-2xl p-4 border border-brand-green/5">
                             <div className="text-left">
