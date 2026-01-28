@@ -38,6 +38,8 @@ jobs:
       - name: Build webview
         run: npm run build
         working-directory: webview
+        env:
+          VITE_NOCODB_API_TOKEN: ${{ secrets.NOCODB_API_TOKEN }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
