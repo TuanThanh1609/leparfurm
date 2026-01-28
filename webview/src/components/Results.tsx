@@ -84,12 +84,12 @@ export function Results({ matches, onRestart, onBuyNow }: ResultsProps) {
 
                         <div className="mb-8">
                             <h3 className="text-xs font-bold uppercase tracking-widest text-brand-dark/30 mb-2">Mô Tả Sản Phẩm</h3>
-                            <p className="text-brand-dark/80 text-sm leading-relaxed font-light italic px-4">
+                            <div className="text-brand-dark/80 text-sm leading-relaxed font-light px-4 whitespace-pre-line text-justify">
                                 {winner.description && winner.description !== winner.title && winner.description.length > 20
                                     ? winner.description
                                     : `Khám phá vẻ đẹp tinh tế của ${winner.title}. Một sáng tạo độc đáo từ thương hiệu ${winner.brand}, mang đến cho bạn những tầng hương quyến rũ và phong cách thời thượng.`
                                 }
-                            </p>
+                            </div>
 
                             <div className="mt-4 flex flex-col gap-2">
                                 <div className="text-[10px] uppercase tracking-wider text-brand-dark/40 font-bold">Hương đặc trưng</div>
