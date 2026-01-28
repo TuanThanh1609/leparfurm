@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; // Triggering redeploy with GitHub Secrets
 import { AnimatePresence, motion } from "framer-motion";
 import { Layout } from "./components/Layout";
 import { Intro } from "./components/Intro";
