@@ -149,13 +149,26 @@ try {
 
     // CSV for Description & Attributes
     console.log('Parsing CSV...');
-    const csvContent = fs.readFileSync(path.join(rootDir, 'products_full.csv'), 'utf-8');
-    const { headers, data: csvData } = parseCSV(csvContent);
+    const csvContent = fs.readFileSync(path.join(rootDir, 'products_full.csv'), 'utf-8').replace(/^\uFEFF/, '');
+    const csvRows = parseCSV(csvContent);
+
+    if (csvRows.length < 2) {
+        throw new Error('CSV file is empty or missing headers');
+    }
+
+    // Map headers to indices
+    const headers = {};
+    csvRows[0].forEach((h, idx) => {
+        headers[h.trim()] = idx;
+    });
+
     const h = headers;
+    const csvData = csvRows.slice(1); // Skip header row
+
     let updatedCount = 0;
     let newFromCsv = 0;
 
-    console.log('Processing CSV data...');
+    console.log(`Processing ${csvData.length} CSV rows...`);
     csvData.forEach(row => {
         const id = row[h['handle']]?.trim();
         if (!id) return;
@@ -274,8 +287,24 @@ try {
     console.log(`Merged ${mixedCount} products, added ${newFromXml} new from XML.`);
 
     // Convert to array
-    const finalProducts = Array.from(products.values());
+    // --- Final Filter ---
+    console.log(`Pre-filter count: ${products.size}`);
 
+    for (const [id, product] of products) {
+        if (!product.price || product.price === 0) {
+            // console.log(`Dropped ${id}: Price is 0`);
+            products.delete(id);
+            continue;
+        }
+        if (!product.image || product.image.includes('icon-ring.svg')) {
+            products.delete(id);
+            continue;
+        }
+    }
+    console.log(`Post-filter count: ${products.size}`);
+
+    const finalProducts = Array.from(products.values());
+    console.log(`Total valid products: ${finalProducts.length}`);
     // Filter out products with no valid title or id
     const validProducts = finalProducts.filter(p => p.id && p.title);
 
