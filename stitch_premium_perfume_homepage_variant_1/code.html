@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>LUMIÈRE - Luxury Perfume Experience</title>
+    <!-- React & Router -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ecb613",
+                        "primary-hover": "#D4A017",
+                        "background-light": "#f8f8f6",
+                        "background-dark": "#221d10",
+                        "charcoal": "#1b180d",
+                        "charcoal-light": "#3b3830",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#2c2618",
+                        "text-main": "#1b180d",
+                        "text-muted": "#6b6656",
+                        "border-color": "#e7e1cf",
+                        "accent-green": "#1E3A3A",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "Playfair Display", "serif"],
+                        "serif": ["Playfair Display", "Noto Serif", "serif"],
+                        "sans": ["Manrope", "Noto Sans", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(230, 179, 37, 0.15)',
+                        'soft': '0 4px 20px -2px rgba(27, 24, 13, 0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Noto+Sans:wght@400;500;700&family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round|Material+Icons+Outlined|Material+Icons" rel="stylesheet"/>
+
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Custom delicate weight for the checkmark */
+        .symbol-delicate {
+            font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 48;
+        }
+        .symbol-regular {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Animation utilities */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-charcoal dark:text-white antialiased transition-colors duration-200">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Components ---
+
+        const BottomNav = () => {
+            const navigate = useNavigate();
+            const location = useLocation();
+
+            const isActive = (path) => location.pathname === path;
+
+            return (
+                <nav class="fixed bottom-0 left-0 right-0 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-t border-gray-200 dark:border-gray-800 z-50 pb-safe">
+                    <div class="flex items-center justify-around h-16">
+                        <button onClick={() => navigate('/')} class={`flex flex-col items-center justify-center gap-1 w-full h-full ${isActive('/') ? 'text-primary' : 'text-gray-400 hover:text-charcoal dark:hover:text-white'} transition-colors`}>
+                            <span class="material-symbols-outlined" style={{fontVariationSettings: isActive('/') ? "'FILL' 1" : "'FILL' 0"}}>home</span>
+                            <span class="text-[10px] font-medium">Home</span>
+                        </button>
+                        <button onClick={() => navigate('/shop')} class={`flex flex-col items-center justify-center gap-1 w-full h-full ${isActive('/shop') ? 'text-primary' : 'text-gray-400 hover:text-charcoal dark:hover:text-white'} transition-colors`}>
+                            <span class="material-symbols-outlined" style={{fontVariationSettings: isActive('/shop') ? "'FILL' 1" : "'FILL' 0"}}>search</span>
+                            <span class="text-[10px] font-bold">Shop</span>
+                        </button>
+                        <button onClick={() => navigate('/quiz-intro')} class={`flex flex-col items-center justify-center gap-1 w-full h-full ${isActive('/quiz-intro') ? 'text-primary' : 'text-gray-400 hover:text-charcoal dark:hover:text-white'} transition-colors`}>
+                            <span class="material-symbols-outlined" style={{fontVariationSettings: isActive('/quiz-intro') ? "'FILL' 1" : "'FILL' 0"}}>psychology_alt</span>
+                            <span class="text-[10px] font-medium">Quiz</span>
+                        </button>
+                        <button onClick={() => navigate('/profile')} class={`flex flex-col items-center justify-center gap-1 w-full h-full ${isActive('/profile') ? 'text-primary' : 'text-gray-400 hover:text-charcoal dark:hover:text-white'} transition-colors`}>
+                            <span class="material-symbols-outlined" style={{fontVariationSettings: isActive('/profile') ? "'FILL' 1" : "'FILL' 0"}}>person</span>
+                            <span class="text-[10px] font-medium">Profile</span>
+                        </button>
+                    </div>
+                    <div class="h-[env(safe-area-inset-bottom)] w-full bg-background-light dark:bg-background-dark"></div>
+                </nav>
+            );
+        };
+
+        const HomePage = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden pb-24">
+                     <header class="sticky top-0 z-50 flex items-center bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-100 dark:border-gray-800 transition-colors duration-200">
+                        <button class="text-charcoal dark:text-white flex size-12 shrink-0 items-center justify-start focus:outline-none">
+                            <span class="material-symbols-outlined" style={{fontSize: "28px"}}>menu</span>
+                        </button>
+                        <h2 class="text-charcoal dark:text-white text-xl font-bold leading-tight tracking-[0.1em] flex-1 text-center uppercase">Lumière</h2>
+                        <div class="flex w-12 items-center justify-end">
+                            <button onClick={() => navigate('/cart')} class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-transparent text-charcoal dark:text-white gap-2 min-w-0 p-0 focus:outline-none">
+                                <span class="material-symbols-outlined" style={{fontSize: "24px"}}>shopping_bag</span>
+                            </button>
+                        </div>
+                    </header>
+
+                    {/* Hero Section from Screen 9 */}
+                    <div class="p-4 pt-2">
+                        <div class="relative w-full aspect-[4/5] rounded-lg overflow-hidden shadow-sm">
+                            <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC8W0R-GzgcYNWIgLy0anQpUhuVV_mfOkVzv7WtS8aDzehhcXS4vQJWq4KV9ihfsdk8AfJI8zFTVI4rOOYeCYlTNXRq-AZZ9enq7qZrnSPSQyHSg0XiN9UXOajrY1CsqzrSNQSzWDAzRzVP8caUjb6QH_Mq5zw6yeTHVb5forBhoWg8oQqj6RxV9sfjM_piFMFL9ifUgBiBbx_gW74asHyZG_mstTxXGKskXEew0PTI6_14n2Na6sTfPfQRaj4AvZscWEZcwxzesc4")'}}></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
+                            <div class="absolute bottom-0 left-0 w-full p-6 flex flex-col items-start gap-3">
+                                <span class="inline-block px-2 py-1 bg-white/20 backdrop-blur-sm border border-white/30 rounded text-[10px] font-bold text-white uppercase tracking-widest">New Collection</span>
+                                <h1 class="text-white text-4xl font-light tracking-wide leading-tight">The Essence <br/><span class="font-bold font-serif italic">of Summer</span></h1>
+                                <p class="text-white/90 text-sm font-medium leading-normal max-w-[240px]">Discover our seasonal favorites inspired by the Amalfi Coast.</p>
+                                <button onClick={() => navigate('/shop')} class="mt-2 flex items-center justify-center rounded-md h-11 px-6 bg-primary text-charcoal text-sm font-bold leading-normal tracking-wide hover:bg-primary/90 transition-colors shadow-lg shadow-black/20">
+                                    Discover Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Quiz Banner */}
+                    <div class="px-4 py-2">
+                        <div class="relative w-full overflow-hidden rounded-lg shadow-md group cursor-pointer" onClick={() => navigate('/quiz-intro')}>
+                            <div class="absolute inset-0 bg-cover bg-center" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuAwAXZMHw-ydQigVmeCmBalTmpjQjIwO9HkNC3upR-EwtKgaYp3xUTnlzNbah2lhODf_An6_JcXUhlgMCojpEFfCLXSJ4-2HLHVJ6ZrsFyBZNA9hVy0yYp8QyHctstkyLCclJgpTAuTaRpx4395Z6MBaqf0TBtwtClMD_8tyG2WA1vxZgm1UWadioxd6xt8Wuy8Wy9kFksiXwzaTcWpXq1kQPZRhaC1wHyp1_ELWyBnEeTB-xWbXi5TWIMK9IrSbHi8eUH05vPPkvo")'}}></div>
+                            <div class="absolute inset-0 bg-black/60 bg-opacity-60 backdrop-blur-[1px]"></div>
+                            <div class="relative flex flex-col items-center justify-center text-center p-8 gap-4">
+                                <span class="material-symbols-outlined text-primary text-4xl animate-pulse">psychology_alt</span>
+                                <h3 class="text-white text-2xl font-serif italic leading-snug">Tìm Kiếm <br/><span class="font-sans font-bold not-italic tracking-wide">Mùi Hương Hoàn Hảo</span></h3>
+                                <p class="text-white/80 text-xs font-medium max-w-[260px] leading-relaxed">Trả lời vài câu hỏi để chúng tôi gợi ý hương thơm phù hợp nhất với phong cách của bạn.</p>
+                                <button class="mt-2 flex items-center justify-center rounded-full h-10 px-8 bg-primary text-charcoal text-xs font-bold uppercase tracking-widest hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(236,182,19,0.3)]">
+                                    Bắt Đầu Quiz
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Best Sellers Preview */}
+                    <div class="px-4 pt-6 pb-4">
+                        <div class="flex justify-between items-center mb-5">
+                            <h2 class="text-charcoal dark:text-white tracking-wide text-xl font-bold leading-tight">Best Sellers</h2>
+                            <div class="h-[1px] flex-1 bg-gray-200 dark:bg-gray-700 ml-4"></div>
+                        </div>
+                         <div class="grid grid-cols-2 gap-x-4 gap-y-8">
+                             {/* Product 1 */}
+                            <div class="flex flex-col group cursor-pointer" onClick={() => navigate('/product/1')}>
+                                <div class="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-white dark:bg-gray-800 mb-3 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800">
+                                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2Z2Rovi3M9oS6kRuF3h8cSVZUteAN5Y7tk5EaebFRCfm1TNnSo7PoNeAUDZ9Wh4yLMnGmLTMRLACDLibd8jnSDSqkkBYWtl8zEEwZz47MV3f_drnAB6PsYwjiK3TkTgg5f_1P71KrQyHNdGdpXvjY7rDe90tnGDn2FfQeh-HYzzik0aaM9HJYweBAxeIJxy_BycgfdFNJ0ieXHfhrDDJO1Ga2hJop0p5yqZ06OeFLiMLVoAheqURpiIUihAWHVNY8YMZ9hTaBdNo")'}}></div>
+                                </div>
+                                <div class="flex flex-col gap-0.5">
+                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-[0.2em]">Lumière</p>
+                                    <h3 class="font-serif text-[17px] font-bold text-charcoal dark:text-white leading-tight">Santal Nuit</h3>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-sm font-semibold text-charcoal dark:text-gray-200">$145</span>
+                                    </div>
+                                </div>
+                            </div>
+                             {/* Product 2 */}
+                             <div class="flex flex-col group cursor-pointer" onClick={() => navigate('/product/2')}>
+                                <div class="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-white dark:bg-gray-800 mb-3 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800">
+                                    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_MvXVKQrFvdJqTrFYtu3tz5CgCIoF9g5cAQ43aVOf7aqpRKUDJKRK4ZNkBexvVurNxPDWBYjAlg1wnM6wp1b0ll1baysROSRqDOnJdkNRSXdTHUWcnIkA1CYz8oZWsd6Dw8Ki9G3N3ymIjaelyEEq9F7Zk6eFxqsIGuEXSVfV888lvkKzoO4TatfuNMnEfvtKBeyaiSU-hTygk35F1wNAfEq6gy1OI2wTuDAX0yj8fbdR5jJ2U7MM0q1QfFhFW7MnSPhaXGTPI8w")'}}></div>
+                                </div>
+                                <div class="flex flex-col gap-0.5">
+                                    <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-[0.2em]">Lumière</p>
+                                    <h3 class="font-serif text-[17px] font-bold text-charcoal dark:text-white leading-tight">Midnight Bloom</h3>
+                                    <div class="flex items-center justify-between mt-1">
+                                        <span class="text-sm font-semibold text-charcoal dark:text-gray-200">$145</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="h-10 bg-background-light dark:bg-background-dark"></div>
+                    <BottomNav />
+                </div>
+            );
+        };
+
+        const ShopPage = () => {
+            const navigate = useNavigate();
+            // Using Screen 1 as the shop listing page
+            const products = [
+                { id: 1, name: "Santal Nuit", price: "$145", notes: "Sandalwood, Amber, Musk", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA2Z2Rovi3M9oS6kRuF3h8cSVZUteAN5Y7tk5EaebFRCfm1TNnSo7PoNeAUDZ9Wh4yLMnGmLTMRLACDLibd8jnSDSqkkBYWtl8zEEwZz47MV3f_drnAB6PsYwjiK3TkTgg5f_1P71KrQyHNdGdpXvjY7rDe90tnGDn2FfQeh-HYzzik0aaM9HJYweBAxeIJxy_BycgfdFNJ0ieXHfhrDDJO1Ga2hJop0p5yqZ06OeFLiMLVoAheqURpiIUihAWHVNY8YMZ9hTaBdNo" },
+                { id: 2, name: "Midnight Bloom", price: "$145", notes: "Jasmine, Tuberose, Sandalwood", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA_MvXVKQrFvdJqTrFYtu3tz5CgCIoF9g5cAQ43aVOf7aqpRKUDJKRK4ZNkBexvVurNxPDWBYjAlg1wnM6wp1b0ll1baysROSRqDOnJdkNRSXdTHUWcnIkA1CYz8oZWsd6Dw8Ki9G3N3ymIjaelyEEq9F7Zk6eFxqsIGuEXSVfV888lvkKzoO4TatfuNMnEfvtKBeyaiSU-hTygk35F1wNAfEq6gy1OI2wTuDAX0yj8fbdR5jJ2U7MM0q1QfFhFW7MnSPhaXGTPI8w" }, // Using Detail image for listing for variety
+                { id: 3, name: "Rose d'Or", price: "$180", notes: "Bulgarian Rose, Saffron", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAbBhpJNrnrbBHJ795TcRG2XTiN5RX_KbXVSzGVjeh6_QydZefD3TIWsYC4aqfRxGVCYWAs6Nsm0q2Vc-DdHZvb5rsk1DEdZ4-aKdLjd-lX8oDLO_WwxmZy1X3LLJGIqf_9Ro-PgjsyoGZIhO1bbToY2DTnWx4_BHr7v-J49bcmJQYEhL30_i8AnM4EH-mblBDtFcu-aKGHHBpsamDJgkJw660dBXHiWD4mC9BD5rBHf0--Iy1FVcXJD5dPHMOOcHXqhwJcjpDXm-c" },
+                { id: 4, name: "Vetiver Rain", price: "$130", notes: "Vetiver, Moss, Ozone", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCSMmIZLt8_bFP-30q35TzfcFBwifG6p5KKob1XAKOJ8oYg-rdWMfjBF7SGV8i0HG5ZtsTtv5fddR0k3qCLQ1h2iRPWxbi9ECkKkEcJLj7xrh3AlwuFgwtOuxrz1EM8U_U1XhgtQJdsGgH6Y4GVfvW_04N_9r7l8xPtau5XYvH71lA7p9VoIZTTC4F_w9SljcmaOZQeZdXZTqgm1bSivnZW106TLxXLxKloHsXxDgOx776hpKWHcU9-fSTmsomvJfM5F6aFn79-qSM" },
+                { id: 5, name: "White Musk", price: "$125", notes: "White Musk, Lily, Pear", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCsXsUyhFfOfoIJiWHZ2eZ6AjKAs7_GMRcn3iAaIq1vD4F0-9-tZCLujkIJo4Mf9xM8gje2cIfoKgpEcEggjpKnw2MUU6WjUsU1RgfUC6UqZ6gTiAd2sciTznBQEtA7jWMsUfj3an3Bfmey8sP9TuPm7wrVa74keghHLp68JRUtRG70JGIzsWIr6Zfw6YiSZbrBYxTtwNfa2ilYb-dXeIKTBXlWUGMPfZ_tG9I0zRE4rh9hHOd7aPyLI3exFvEkSBtZhQ-tXcP3UKo" },
+                { id: 6, name: "Oud Noir", price: "$210", notes: "Agarwood, Leather, Smoke", img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCnem3dei-6N_dzhVEZrAPQfQJAkb8kscQ1fJLJtzfJqRyaEbqgt7-HqQ5hmOKrBiHwHakWWGMB0oDJJqmI0IeqfCiXfXKNmxhrwoSm2tD7Nw1Hf-oqOdSRXePSxDn-0R-uQAYhJAUpKx8IaKksBq6O_1iirjj8dDqHYhVk70nsVx0hAtgyg0dXbciHlTWWkfs3aAcvWqRaVfNs4Rq7U4MO4ykoeqIDK6ntFZlrfeL2f3Jae3t77csHNLPUmq4A1TmRKtLG0rxG3hk" },
+            ];
+
+            return (
+                <div class="relative flex h-auto min-h-screen w-full flex-col group/design-root overflow-x-hidden pb-24">
+                    <header class="sticky top-0 z-50 flex items-center bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md p-4 pb-2 justify-between border-b border-gray-100 dark:border-gray-800 transition-colors duration-200">
+                        <button class="text-charcoal dark:text-white flex size-12 shrink-0 items-center justify-start focus:outline-none">
+                            <span class="material-symbols-outlined" style={{fontSize: "28px"}}>menu</span>
+                        </button>
+                        <h2 class="text-charcoal dark:text-white text-xl font-bold leading-tight tracking-[0.1em] flex-1 text-center uppercase">Shop</h2>
+                         <div class="flex w-12 items-center justify-end">
+                            <button onClick={() => navigate('/cart')} class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-transparent text-charcoal dark:text-white gap-2 min-w-0 p-0 focus:outline-none">
+                                <span class="material-symbols-outlined" style={{fontSize: "24px"}}>shopping_bag</span>
+                            </button>
+                        </div>
+                    </header>
+
+                    <div class="sticky top-[65px] z-40 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-sm px-4 py-4 flex items-center justify-between border-b border-transparent transition-all duration-300">
+                        <span class="text-sm font-medium text-charcoal-light dark:text-gray-400">{products.length} items</span>
+                        <button class="group flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-charcoal-light border border-charcoal/10 dark:border-white/10 rounded-full shadow-sm active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-[18px] text-charcoal dark:text-white">tune</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-charcoal dark:text-white">Filter & Sort</span>
+                        </button>
+                    </div>
+
+                    <div class="px-4 pb-4 pt-2">
+                        <div class="grid grid-cols-2 gap-x-4 gap-y-8">
+                            {products.map(p => (
+                                <div key={p.id} class="flex flex-col group cursor-pointer" onClick={() => navigate(`/product/${p.id}`)}>
+                                    <div class="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-white dark:bg-gray-800 mb-3 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 dark:border-gray-800">
+                                        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: `url("${p.img}")`}}>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-0.5">
+                                        <p class="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-[0.2em]">Lumière</p>
+                                        <h3 class="font-serif text-[17px] font-bold text-charcoal dark:text-white leading-tight">{p.name}</h3>
+                                        <p class="text-xs font-medium text-charcoal-light/70 dark:text-gray-400 mb-2">{p.notes}</p>
+                                        <div class="flex items-center justify-between mt-1">
+                                            <span class="text-sm font-semibold text-charcoal dark:text-gray-200">{p.price}</span>
+                                            <button class="flex items-center justify-center w-7 h-7 rounded-full border border-charcoal/20 dark:border-white/20 text-charcoal dark:text-white hover:bg-charcoal hover:text-white dark:hover:bg-white dark:hover:text-charcoal transition-colors">
+                                                <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <BottomNav />
+                </div>
+            );
+        };
+
+        const ProductDetail = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="bg-background-light dark:bg-background-dark text-text-main dark:text-[#f2f0e9] font-display min-h-screen flex flex-col transition-colors duration-200">
+                    <div class="fixed top-0 z-50 w-full bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md transition-colors duration-200">
+                        <div class="flex items-center justify-between p-4 max-w-md mx-auto">
+                            <button onClick={() => navigate(-1)} class="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-text-main dark:text-white">
+                                <span class="material-symbols-outlined">arrow_back</span>
+                            </button>
+                            <div class="font-bold tracking-widest text-sm uppercase text-text-main dark:text-white">Midnight Bloom</div>
+                            <button onClick={() => navigate('/cart')} class="flex size-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-text-main dark:text-white relative">
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <span class="absolute top-2 right-2 size-2 bg-primary rounded-full"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <main class="flex-grow pt-20 pb-32 max-w-md mx-auto w-full px-4 overflow-x-hidden">
+                        <div class="flex flex-col gap-4 mb-8">
+                            <div class="w-full bg-surface-light dark:bg-surface-dark aspect-[4/5] rounded-2xl overflow-hidden shadow-sm relative group">
+                                <div class="w-full h-full bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_MvXVKQrFvdJqTrFYtu3tz5CgCIoF9g5cAQ43aVOf7aqpRKUDJKRK4ZNkBexvVurNxPDWBYjAlg1wnM6wp1b0ll1baysROSRqDOnJdkNRSXdTHUWcnIkA1CYz8oZWsd6Dw8Ki9G3N3ymIjaelyEEq9F7Zk6eFxqsIGuEXSVfV888lvkKzoO4TatfuNMnEfvtKBeyaiSU-hTygk35F1wNAfEq6gy1OI2wTuDAX0yj8fbdR5jJ2U7MM0q1QfFhFW7MnSPhaXGTPI8w")'}}></div>
+                                <button class="absolute top-4 right-4 size-10 bg-white/80 dark:bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-text-main dark:text-white hover:bg-primary hover:text-white transition-colors">
+                                    <span class="material-symbols-outlined text-[20px]">favorite</span>
+                                </button>
+                            </div>
+                            <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                                <button class="shrink-0 w-20 aspect-square rounded-xl border-2 border-primary overflow-hidden relative p-1 bg-surface-light dark:bg-surface-dark">
+                                    <div class="w-full h-full rounded-lg bg-center bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBC0g8byAYko-w31RnSt05nLwrgwywSCKqoFeInq8Lws_Etqf2UuO9-xtx6VFvqCFAmwLQ1F9-D1dNIrEKEggIV6RLiYNGtMwTEJWFTthii7QTDFBALCWknYrUq9u4VQxSvAG15wLiYfxBhkh5MWBM727qLHEzAYlW9ASRHN0JVisSMzd5h-BSACbhmqrZ96d1CKXJvNBsTOrF8CYI9nnYd6cSmEI6Zd80MH4zb8Xl5xaJPiDVPShJSsnN3vcc-OT62PA8b3NsrB2U")'}}></div>
+                                </button>
+                                <button class="shrink-0 w-20 aspect-square rounded-xl border-2 border-transparent overflow-hidden relative p-1 bg-surface-light dark:bg-surface-dark opacity-70 hover:opacity-100 transition-opacity">
+                                    <div class="w-full h-full rounded-lg bg-center bg-cover" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuCzpTWNbcdUAZjghZo05q1Mkkz22mY-DBLh2GCReqe60K4x8gKpdFguPzyOJqmX87PgCcOjjoSBIigRQViUALyKDcw8qgJDwffSV6ah6g4x3d8A3BHGMbeXjo_LySBkxjO85OzZKqkmiyM99yVvbPF9QLTDaC2vxwOLgb5_mnUl3jPc7wFRaAJ2XKv9RQNAMK2QFdtkXb9rdpWMgGeMqWc_VIOqFFs58sbRNRvlPeOZYzQhj6SNwGm7-8CR9cctxM7mDDu7oRMQwSM")'}}></div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-8">
+                            <div class="inline-flex items-center gap-1 mb-3 text-primary text-sm font-medium bg-primary/10 px-3 py-1 rounded-full">
+                                <span class="material-symbols-outlined text-[16px] fill-current">star</span>
+                                <span>4.9 (128 Reviews)</span>
+                            </div>
+                            <h1 class="text-text-main dark:text-white text-3xl md:text-4xl font-bold leading-tight mb-2 tracking-tight">Midnight Bloom</h1>
+                            <p class="text-text-muted dark:text-gray-400 text-base mb-4 font-sans italic">Eau de Parfum — 50ml</p>
+                            <div class="text-2xl font-bold text-text-main dark:text-white">$145.00</div>
+                        </div>
+
+                        <div class="mb-10">
+                            <h2 class="text-lg font-bold text-center mb-6 text-text-main dark:text-white uppercase tracking-widest text-xs border-b border-gray-200 dark:border-gray-800 pb-2 mx-10">Fragrance Notes</h2>
+                            <div class="grid grid-cols-3 gap-2">
+                                <div class="flex flex-col items-center text-center p-3 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+                                    <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-3">
+                                        <span class="material-symbols-outlined">spa</span>
+                                    </div>
+                                    <span class="text-[10px] uppercase tracking-wider font-bold text-text-muted dark:text-gray-500 mb-1">Top</span>
+                                    <span class="text-sm font-semibold text-text-main dark:text-white leading-tight">Bergamot & Pear</span>
+                                </div>
+                                <div class="flex flex-col items-center text-center p-3 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 relative overflow-hidden">
+                                    <div class="absolute top-0 w-full h-0.5 bg-primary"></div>
+                                    <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-3">
+                                        <span class="material-symbols-outlined">filter_vintage</span>
+                                    </div>
+                                    <span class="text-[10px] uppercase tracking-wider font-bold text-text-muted dark:text-gray-500 mb-1">Heart</span>
+                                    <span class="text-sm font-semibold text-text-main dark:text-white leading-tight">Night Jasmine</span>
+                                </div>
+                                <div class="flex flex-col items-center text-center p-3 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-gray-100 dark:border-gray-800">
+                                    <div class="size-10 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-3">
+                                        <span class="material-symbols-outlined">forest</span>
+                                    </div>
+                                    <span class="text-[10px] uppercase tracking-wider font-bold text-text-muted dark:text-gray-500 mb-1">Base</span>
+                                    <span class="text-sm font-semibold text-text-main dark:text-white leading-tight">Sandalwood</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-10 px-2">
+                            <h3 class="text-lg font-bold mb-3 text-text-main dark:text-white">The Scent</h3>
+                            <p class="text-text-muted dark:text-gray-300 leading-relaxed text-[15px] font-sans">
+                                An intoxicating blend that captures the mystery of a moonlit garden. Midnight Bloom opens with the sparkling zest of Italian Bergamot, quickly surrendering to a hypnotic heart of Night Jasmine and Tuberose. As the evening deepens, warm notes of Sandalwood and Vanilla Bean leave a lingering, sensual trail on the skin.
+                            </p>
+                        </div>
+                    </main>
+
+                    <div class="fixed bottom-0 w-full z-40 bg-white dark:bg-[#1a160d] border-t border-gray-100 dark:border-gray-800 pb-safe pt-4 px-4 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+                        <div class="max-w-md mx-auto flex items-center gap-4 pb-4">
+                            <div class="flex items-center h-12 border border-gray-200 dark:border-gray-700 rounded-xl bg-background-light dark:bg-surface-dark">
+                                <button class="w-10 h-full flex items-center justify-center text-text-muted hover:text-text-main dark:hover:text-white">
+                                    <span class="material-symbols-outlined text-lg">remove</span>
+                                </button>
+                                <span class="w-8 text-center font-bold text-text-main dark:text-white">1</span>
+                                <button class="w-10 h-full flex items-center justify-center text-text-muted hover:text-text-main dark:hover:text-white">
+                                    <span class="material-symbols-outlined text-lg">add</span>
+                                </button>
+                            </div>
+                            <button onClick={() => navigate('/cart')} class="flex-1 h-12 bg-primary hover:bg-[#d9a610] text-[#1b180d] rounded-xl font-bold text-base tracking-wide flex items-center justify-center gap-2 transition-colors shadow-lg shadow-primary/20">
+                                <span class="material-symbols-outlined">shopping_bag</span>
+                                <span>Add to Cart • $145</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Cart = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-[#e7e1cf] font-display antialiased overflow-x-hidden min-h-screen flex flex-col">
+                    <header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm px-4 py-4 flex items-center justify-between border-b border-black/5 dark:border-white/5 transition-colors duration-200">
+                        <button onClick={() => navigate(-1)} class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                            <span class="material-symbols-outlined text-[24px]">arrow_back</span>
+                        </button>
+                        <h1 class="text-xl font-semibold tracking-wide text-center flex-1 pr-10">Your Selection</h1>
+                    </header>
+                    <main class="flex-1 overflow-y-auto pb-32">
+                        {/* Item 1 */}
+                        <div class="px-5 py-6 border-b border-black/5 dark:border-white/5">
+                            <div class="flex gap-5">
+                                <div class="relative shrink-0 overflow-hidden rounded-lg bg-[#f3f0e7] dark:bg-surface-dark w-[88px] h-[88px]">
+                                    <img alt="Midnight Bloom" class="h-full w-full object-cover mix-blend-multiply dark:mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk76cK1IvyS2X7EPxLzbEibRxC5MDfRPco0iyJeqLh3pm6bIsO1XrFfB6uPwhX3SqZNqP79_qWjOfm7IJj5r2PrVJ65f_SqrtPU984TzJi37zi4GLvx9EwgXShG0KaAJqgfhbkIoaFAEidbI0seqCVi0W-7K_YcAr-Cko9d8Jmkl61rZxhljMH0itz6n-4LjcZIwwaS0S5Ry_o9WQdpy3gXA0IeMlp8wYIhlAaoio5uCIzOEaU9yai_8RVZOFjURlSA6N0wH_Buhk"/>
+                                </div>
+                                <div class="flex flex-1 flex-col justify-between py-1">
+                                    <div>
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-medium leading-tight">Midnight Bloom</h3>
+                                            <button class="text-text-secondary-light hover:text-red-500 transition-colors p-1 -mr-2">
+                                                <span class="material-symbols-outlined text-[20px]">close</span>
+                                            </button>
+                                        </div>
+                                        <p class="text-text-secondary-light text-sm mt-1 dark:text-gray-400">50ml - Eau de Parfum</p>
+                                    </div>
+                                    <div class="flex items-end justify-between mt-2">
+                                        <p class="font-medium">$145.00</p>
+                                        <div class="flex items-center gap-1 rounded-full border border-black/10 dark:border-white/10 px-1 py-0.5">
+                                            <button class="flex h-7 w-7 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary-light transition-colors">
+                                                <span class="material-symbols-outlined text-[16px]">remove</span>
+                                            </button>
+                                            <span class="w-6 text-center text-sm font-medium">1</span>
+                                            <button class="flex h-7 w-7 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary-light transition-colors">
+                                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Item 2 */}
+                        <div class="px-5 py-6 border-b border-black/5 dark:border-white/5">
+                            <div class="flex gap-5">
+                                <div class="relative shrink-0 overflow-hidden rounded-lg bg-[#f3f0e7] dark:bg-surface-dark w-[88px] h-[88px]">
+                                    <img alt="Golden Amber" class="h-full w-full object-cover mix-blend-multiply dark:mix-blend-normal" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0uJ1bL6yfIZhQc5f72rOBnGVhu1BxSkvuWDC4tL3lsAgvKb-4QVm-dKhy24M7MyxfKhU4mOdjGcybOslOBRwAhOopEEcRo_eIaMfexl2q37mXBn1yHsyA73l_Y9oS_ydvevA0SpjAz83Ti-zhKi2X6CqXi6QRwTV84nUBjHi0go6uHCBCKXBQYixWp9nXsn4Fs40T1jeHdjDd-98ifh6AVGEq2kIjM8FiKMLdKGXVPTABlKFUjEDzrQa51ZZwGDhd_ajfMTTL6VM"/>
+                                </div>
+                                <div class="flex flex-1 flex-col justify-between py-1">
+                                    <div>
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-medium leading-tight">Golden Amber</h3>
+                                            <button class="text-text-secondary-light hover:text-red-500 transition-colors p-1 -mr-2">
+                                                <span class="material-symbols-outlined text-[20px]">close</span>
+                                            </button>
+                                        </div>
+                                        <p class="text-text-secondary-light text-sm mt-1 dark:text-gray-400">100ml - Eau de Parfum</p>
+                                    </div>
+                                    <div class="flex items-end justify-between mt-2">
+                                        <p class="font-medium">$180.00</p>
+                                         <div class="flex items-center gap-1 rounded-full border border-black/10 dark:border-white/10 px-1 py-0.5">
+                                            <button class="flex h-7 w-7 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary-light transition-colors">
+                                                <span class="material-symbols-outlined text-[16px]">remove</span>
+                                            </button>
+                                            <span class="w-6 text-center text-sm font-medium">1</span>
+                                            <button class="flex h-7 w-7 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-text-secondary-light transition-colors">
+                                                <span class="material-symbols-outlined text-[16px]">add</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-5 py-6">
+                            <label class="group flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center gap-4">
+                                    <div class="relative flex items-center">
+                                        <input class="peer h-6 w-6 rounded border-2 border-[#d4d1c5] dark:border-gray-600 bg-transparent text-primary checked:bg-primary checked:border-primary focus:ring-0 focus:ring-offset-0 transition-all cursor-pointer" type="checkbox"/>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-base font-medium">Signature Gift Wrap</span>
+                                        <span class="text-sm text-text-secondary-light dark:text-gray-400">Includes handwritten note</span>
+                                    </div>
+                                </div>
+                                <span class="text-sm font-medium text-primary">+$5.00</span>
+                            </label>
+                        </div>
+                    </main>
+                    <div class="absolute bottom-0 left-0 right-0 bg-background-light dark:bg-background-dark border-t border-black/5 dark:border-white/5 p-6 pb-8 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] dark:shadow-none z-40">
+                        <div class="space-y-3 mb-6">
+                            <div class="flex justify-between items-center text-text-secondary-light dark:text-gray-400">
+                                <span class="text-sm">Subtotal</span>
+                                <span class="text-sm font-medium text-text-primary-light dark:text-white">$325.00</span>
+                            </div>
+                             <div class="flex justify-between items-center text-text-secondary-light dark:text-gray-400">
+                                <span class="text-sm">Shipping</span>
+                                <span class="text-sm font-medium text-text-primary-light dark:text-white">Complimentary</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-3 border-t border-black/5 dark:border-white/5">
+                                <span class="text-base font-medium">Total</span>
+                                <span class="text-xl font-bold">$325.00</span>
+                            </div>
+                        </div>
+                        <button onClick={() => navigate('/checkout')} class="w-full bg-primary hover:bg-primary/90 text-white font-medium py-4 rounded-lg shadow-lg shadow-primary/20 active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2">
+                            <span>Proceed to Checkout</span>
+                            <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const Checkout = () => {
+            const navigate = useNavigate();
+            return (
+                 <div class="relative flex min-h-screen w-full flex-col overflow-x-hidden pb-32 md:pb-0 bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100">
+                    <header class="sticky top-0 z-50 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md border-b border-border-color dark:border-gray-800 transition-colors">
+                        <div class="flex items-center p-4 justify-between max-w-lg mx-auto w-full">
+                            <button onClick={() => navigate(-1)} class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                                <span class="material-symbols-outlined text-text-main dark:text-gray-100">arrow_back_ios_new</span>
+                            </button>
+                            <h2 class="text-text-main dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Checkout</h2>
+                            <div class="size-10"></div>
+                        </div>
+                    </header>
+                    <main class="flex-1 w-full max-w-lg mx-auto flex flex-col px-4 pt-2">
+                        <div class="flex w-full flex-row items-center justify-center gap-3 py-6">
+                            <div class="h-2 w-8 rounded-full bg-primary shadow-sm shadow-primary/30"></div>
+                            <div class="h-2 w-2 rounded-full bg-border-color dark:bg-gray-700"></div>
+                            <div class="h-2 w-2 rounded-full bg-border-color dark:bg-gray-700"></div>
+                        </div>
+                        <div class="flex flex-col gap-4">
+                            <details class="group rounded-xl border border-border-color dark:border-gray-700 bg-surface-light dark:bg-surface-dark overflow-hidden transition-all duration-300">
+                                <summary class="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 select-none">
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary/20 text-primary text-xs font-bold dark:bg-primary/30 dark:text-primary">1</span>
+                                        <p class="text-text-main dark:text-gray-100 text-base font-semibold">Shipping Information</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-text-muted dark:text-gray-400 group-open:rotate-180 transition-transform">expand_more</span>
+                                </summary>
+                                <div class="px-5 pb-6 pt-2 space-y-4 border-t border-border-color dark:border-gray-700/50">
+                                    <div class="flex gap-4">
+                                        <div class="flex-1 space-y-1.5">
+                                            <label class="text-xs font-medium text-text-main dark:text-gray-300 ml-1">First Name</label>
+                                            <input class="w-full rounded-lg border border-border-color dark:border-gray-600 bg-background-light dark:bg-background-dark p-3 text-sm text-text-main dark:text-white placeholder:text-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Jane" type="text"/>
+                                        </div>
+                                         <div class="flex-1 space-y-1.5">
+                                            <label class="text-xs font-medium text-text-main dark:text-gray-300 ml-1">Last Name</label>
+                                            <input class="w-full rounded-lg border border-border-color dark:border-gray-600 bg-background-light dark:bg-background-dark p-3 text-sm text-text-main dark:text-white placeholder:text-text-muted focus:border-primary focus:ring-1 focus:ring-primary outline-none" placeholder="Doe" type="text"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+                             <details class="group rounded-xl border border-border-color dark:border-gray-700 bg-surface-light dark:bg-surface-dark overflow-hidden transition-all duration-300" open>
+                                <summary class="flex cursor-pointer items-center justify-between gap-4 px-5 py-4 select-none">
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-white text-xs font-bold shadow-md shadow-primary/20">2</span>
+                                        <p class="text-text-main dark:text-gray-100 text-base font-semibold">Delivery Method</p>
+                                    </div>
+                                    <span class="material-symbols-outlined text-text-muted dark:text-gray-400 group-open:rotate-180 transition-transform">expand_more</span>
+                                </summary>
+                                <div class="px-5 pb-6 pt-2 space-y-3 border-t border-border-color dark:border-gray-700/50">
+                                     <label class="relative flex cursor-pointer items-center rounded-lg border-2 border-primary bg-primary/5 dark:bg-primary/10 p-4 transition-colors">
+                                        <input defaultChecked class="peer h-5 w-5 border-gray-300 text-primary focus:ring-primary dark:bg-gray-700 dark:border-gray-600" name="delivery" type="radio"/>
+                                        <div class="ml-4 flex flex-1 flex-col">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm font-bold text-text-main dark:text-gray-100">Premium Express</span>
+                                                <span class="rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider">Fast</span>
+                                            </div>
+                                            <span class="text-xs text-text-muted dark:text-gray-400">Next Day Delivery</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-primary">$15.00</span>
+                                    </label>
+                                </div>
+                            </details>
+                        </div>
+                         <div class="mt-8 mb-6 rounded-xl bg-surface-light dark:bg-surface-dark p-5 shadow-sm border border-border-color dark:border-gray-800">
+                            <h3 class="mb-4 text-sm font-bold uppercase tracking-wider text-text-muted dark:text-gray-400">Order Summary</h3>
+                            <div class="space-y-2 text-sm">
+                                <div class="mt-2 flex justify-between border-t border-border-color dark:border-gray-700/50 pt-3 text-base font-bold text-text-main dark:text-white">
+                                    <span>Total</span>
+                                    <span class="text-lg">$340.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <div class="fixed bottom-0 left-0 right-0 border-t border-border-color bg-surface-light/80 p-4 pb-8 backdrop-blur-md dark:bg-background-dark/80 dark:border-gray-800 md:static md:bg-transparent md:p-0 md:pt-4 md:backdrop-blur-none">
+                        <div class="mx-auto max-w-lg px-4 md:px-0">
+                            <button onClick={() => navigate('/confirmation')} class="group relative w-full overflow-hidden rounded-lg bg-primary py-4 text-center font-bold text-text-main shadow-lg shadow-primary/25 transition-transform active:scale-[0.98] hover:shadow-primary/40 dark:text-black">
+                                <span class="relative z-10 flex items-center justify-center gap-2">
+                                    Place Order <span class="hidden text-sm font-normal opacity-80 sm:inline">- $340.00</span>
+                                    <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                 </div>
+            );
+        };
+
+        const Confirmation = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="relative w-full max-w-md mx-auto min-h-screen flex flex-col bg-background-light dark:bg-background-dark overflow-hidden shadow-2xl">
+                    <div class="flex items-center justify-between p-6">
+                        <div class="w-10"></div>
+                        <div class="w-10 flex justify-end">
+                            <button onClick={() => navigate('/')} class="flex items-center justify-center text-text-main dark:text-white/80 hover:text-primary transition-colors">
+                                <span class="material-symbols-outlined symbol-regular">close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto px-6 pb-24">
+                        <div class="flex flex-col items-center text-center pt-2 pb-8 animate-fade-in-up">
+                            <div class="flex items-center justify-center size-20 rounded-full bg-primary/10 mb-6">
+                                <span class="material-symbols-outlined text-primary text-5xl symbol-delicate">check_circle</span>
+                            </div>
+                            <h1 class="text-4xl font-medium tracking-tight text-text-main dark:text-white mb-3">Thank You, Sophia</h1>
+                            <p class="text-base font-sans text-text-main/70 dark:text-white/70 max-w-xs leading-relaxed">
+                                Your order has been placed successfully. A confirmation email has been sent to your inbox.
+                            </p>
+                        </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-soft border border-[#e7e1cf] dark:border-white/10 p-0 overflow-hidden mb-6">
+                             <div class="flex items-center justify-between p-5 border-b border-[#e7e1cf]/50 dark:border-white/5">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-sans font-bold text-text-muted uppercase tracking-wider">Order No.</span>
+                                    <span class="text-lg font-medium text-text-main dark:text-white">#ORD-8920</span>
+                                </div>
+                            </div>
+                             <div class="p-5 flex gap-4 items-start">
+                                <div class="w-20 h-24 bg-gray-100 dark:bg-white/5 rounded-lg bg-cover bg-center shrink-0 border border-[#e7e1cf] dark:border-white/10" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBNE_jUCEzOBmMXnF2lJXiXSHg2jfnPEQ0syxDIsEOpViUdy4kLvp2eaxH7nP4vhjiqB6rAQgZrrI63OyFOO1wBcqDnLHsKpJcQej7TKgrzRSNKXKnfUfnMrB38LPw16d3ESHKnYvzCHaBfSJ46pyqNTqBXGYGcWyUDXnrCe2M1qjuwWo2bzyXfBnaUiWoi3xT2cvWs90vg4u0FjVItooVgolqrGVuzjjb4Dys-bLx_9LQk1OG2-KY-VvspXVDWlrO75_Y9l6_hGE0')"}}></div>
+                                <div class="flex flex-col flex-1 pt-1">
+                                    <h3 class="text-xl font-bold leading-tight text-text-main dark:text-white mb-1">Midnight Bloom</h3>
+                                    <p class="text-sm font-sans text-text-main/60 dark:text-white/60 mb-3">Eau de Parfum • 50ml</p>
+                                    <div class="flex justify-between items-end mt-auto w-full">
+                                        <p class="text-sm font-sans text-text-muted">Qty: 1</p>
+                                        <p class="text-lg font-medium text-text-main dark:text-white">$145.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark pt-12">
+                        <button onClick={() => navigate('/profile')} class="w-full bg-primary hover:bg-primary/90 text-white font-sans font-medium text-base h-14 rounded-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.99] flex items-center justify-center gap-2 group">
+                            Track Order
+                            <span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const QuizIntro = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="bg-background-light dark:bg-background-dark font-body antialiased min-h-screen flex items-center justify-center p-4">
+                    <div class="w-full max-w-md h-[800px] max-h-[90vh] bg-[#0E1525] rounded-[32px] overflow-hidden relative flex flex-col shadow-2xl border border-gray-800">
+                        <div class="absolute inset-0 opacity-20 pointer-events-none">
+                            <div class="absolute top-[-10%] left-[-10%] w-64 h-64 bg-blue-900 rounded-full mix-blend-screen filter blur-[60px]"></div>
+                            <div class="absolute bottom-[-10%] right-[-10%] w-80 h-80 bg-blue-950 rounded-full mix-blend-screen filter blur-[80px]"></div>
+                        </div>
+                        <div class="relative z-10 flex-1 flex flex-col justify-center items-center px-8 text-center mt-12">
+                            <div class="inline-flex items-center justify-center px-6 py-2 border border-yellow-600/50 rounded-full bg-blue-900/20 backdrop-blur-sm mb-10">
+                                <span class="text-[#E6B325] text-xs font-semibold tracking-[0.15em] uppercase">Tìm hương phù hợp</span>
+                            </div>
+                            <h1 class="font-display text-5xl md:text-6xl leading-tight mb-2">
+                                <span class="text-white block">Khám Phá</span>
+                                <span class="text-primary italic font-medium block mt-2">Hương Thơm</span>
+                                <span class="text-primary italic font-medium block">Của Bạn</span>
+                            </h1>
+                            <p class="text-blue-100/70 text-base leading-relaxed font-light mt-8 max-w-xs mx-auto">
+                                Trả lời 3 câu hỏi đơn giản và để chúng tôi tìm mùi hương phù hợp nhất cho bạn.
+                            </p>
+                        </div>
+                        <div class="relative z-10 p-8 pb-12 w-full">
+                            <button onClick={() => navigate('/quiz-q1')} class="w-full group bg-primary hover:bg-primary-hover transition-all duration-300 text-[#0E1525] font-bold py-4 px-6 rounded-full flex items-center justify-center shadow-glow transform hover:scale-[1.02] active:scale-[0.98]">
+                                <span class="font-display font-bold text-lg tracking-wide mr-2">Bắt Đầu Ngay</span>
+                                <span class="material-icons-round text-xl transform group-hover:translate-x-1 transition-transform duration-300">arrow_forward</span>
+                            </button>
+                        </div>
+                        <button onClick={() => navigate('/')} class="absolute top-6 left-6 text-white/50 hover:text-white z-20">
+                            <span class="material-icons-round">close</span>
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const QuizQuestion = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="bg-background-light dark:bg-background-dark min-h-screen text-slate-800 dark:text-slate-200 font-sans transition-colors duration-300">
+                    <div class="max-w-md mx-auto min-h-screen flex flex-col px-6 py-8 relative">
+                        <header class="flex items-center justify-between mb-2">
+                            <button onClick={() => navigate(-1)} class="p-2 -ml-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-slate-600 dark:text-slate-400">
+                                <span class="material-icons">arrow_back</span>
+                            </button>
+                            <div class="text-xs font-bold tracking-[0.2em] text-gray-400 dark:text-gray-500 uppercase">
+                                Câu 1 / 3
+                            </div>
+                            <div class="w-10"></div>
+                        </header>
+                        <div class="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full mb-10 overflow-hidden">
+                            <div class="h-full bg-primary w-1/3 rounded-full"></div>
+                        </div>
+                        <main class="flex-grow">
+                            <h1 class="font-display text-3xl md:text-4xl text-accent-green dark:text-white mb-10 leading-tight">
+                                Bạn sẽ dùng nước hoa ở đâu?
+                            </h1>
+                            <form class="space-y-4">
+                                {['Đi làm / Văn phòng', 'Hẹn hò', 'Tiệc / Sự kiện', 'Gym / Thể thao', 'Ở nhà thư giãn'].map((opt, i) => (
+                                    <label key={i} onClick={() => setTimeout(() => navigate('/quiz-result'), 300)} class="group relative flex items-center justify-between w-full bg-surface-light dark:bg-surface-dark p-5 rounded-xl shadow-soft border border-transparent hover:border-primary/30 cursor-pointer transition-all duration-200">
+                                        <span class="text-base font-medium text-slate-700 dark:text-slate-200 group-hover:text-accent-green dark:group-hover:text-primary transition-colors">
+                                            {opt}
+                                        </span>
+                                        <input class="peer sr-only" name="location" type="radio"/>
+                                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-gray-600 peer-checked:border-primary peer-checked:bg-primary relative flex items-center justify-center transition-all">
+                                            <div class="w-2.5 h-2.5 bg-white rounded-full opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                                        </div>
+                                    </label>
+                                ))}
+                            </form>
+                        </main>
+                    </div>
+                </div>
+            );
+        };
+
+        const QuizResult = () => {
+            const navigate = useNavigate();
+            const [showToast, setShowToast] = useState(false);
+
+            const handleSave = () => {
+                setShowToast(true);
+                setTimeout(() => setShowToast(false), 3000);
+            };
+
+            return (
+                <div class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-body antialiased transition-colors duration-300 min-h-screen flex justify-center">
+                    <div class="w-full max-w-md bg-background-light dark:bg-background-dark min-h-screen relative flex flex-col shadow-2xl overflow-hidden">
+                        <header class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-10">
+                            <button onClick={() => navigate('/')} class="p-2 rounded-full bg-surface-light/20 dark:bg-surface-dark/40 backdrop-blur-sm text-text-main-light dark:text-white hover:bg-surface-light/40 transition">
+                                <span class="material-icons-outlined text-2xl">arrow_back</span>
+                            </button>
+                             <div class="flex gap-4">
+                                <button class="p-2 rounded-full bg-surface-light/20 dark:bg-surface-dark/40 backdrop-blur-sm text-text-main-light dark:text-white hover:bg-surface-light/40 transition">
+                                    <span class="material-icons-outlined text-2xl">favorite_border</span>
+                                </button>
+                            </div>
+                        </header>
+                         <main class="flex-grow flex flex-col items-center pt-24 pb-48 px-6 overflow-y-auto no-scrollbar scroll-smooth">
+                            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 dark:bg-primary/20 text-primary-dark dark:text-primary border border-primary/30 mb-6 animate-fade-in-up">
+                                <span class="material-icons-outlined text-sm">stars</span>
+                                <span class="text-xs font-bold tracking-wider uppercase">Lựa Chọn Hoàn Hảo</span>
+                            </div>
+                             <div class="relative w-full aspect-[4/5] mb-8 rounded-2xl overflow-hidden shadow-soft dark:shadow-none group">
+                                <div class="absolute inset-0 bg-gradient-to-br from-[#E8E8E8] to-[#F5F5F5] dark:from-[#1A2640] dark:to-[#0F1C30] opacity-100 transition-colors"></div>
+                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl"></div>
+                                <img alt="Luxury Perfume Bottle" class="absolute inset-0 w-full h-full object-contain p-8 drop-shadow-xl transform group-hover:scale-105 transition duration-700 ease-out" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJQW9KaWU1gsZzPGMLNZuYV673TFum2dVR9hdiGHnURoa0pJBOBKfOtKJYW7ikKHEGSL2SjlJUDKSC_ocVk56nmvE3deRz05GjOiDC6-I9bqUfoAoLYUr5oWj642TgmNdPiebWdqL_vDoUBw-I1u3PyYeBCa_Suw1hy7gPEQ72OurXFKm2D1R6dcw6cp-FXk993D1zPAec1BAfDYgr8Xo_tztTTaHAJbn08iV4XjYNCBG-laGPLwnRP0fM8lPgmUVV9Wo82l-qLUI"/>
+                                <div class="absolute top-4 right-4 z-10">
+                                    <div class="relative w-24 h-24 rounded-full bg-surface-light/90 dark:bg-surface-dark/90 backdrop-blur-md shadow-xl border border-primary/20 flex items-center justify-center p-1">
+                                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                            <span class="text-[10px] uppercase tracking-widest text-text-sub-light dark:text-gray-400 font-bold mb-0.5">Match</span>
+                                            <span class="font-display font-bold text-2xl text-primary leading-none">98%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-center w-full space-y-3 mb-8">
+                                <h3 class="text-accent-green dark:text-primary font-display text-lg tracking-widest uppercase opacity-80">Eau de Parfum</h3>
+                                <h1 class="text-4xl font-display font-bold text-accent-green dark:text-white">Midnight Bloom</h1>
+                                <p class="text-lg text-text-sub-light dark:text-text-sub-dark font-display italic">Hương Gỗ & Hổ Phách</p>
+                            </div>
+
+                            {/* Fragrance Notes */}
+                            <div class="w-full mb-8 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
+                                <h2 class="text-xs font-bold uppercase tracking-widest text-text-muted dark:text-gray-400 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">Thông tin mùi hương</h2>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="flex flex-col items-center text-center p-3 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                                        <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
+                                            <span class="material-symbols-outlined text-lg">spa</span>
+                                        </div>
+                                        <span class="text-[10px] uppercase font-bold text-text-muted dark:text-gray-500 mb-1">Hương đầu</span>
+                                        <span class="text-xs font-semibold dark:text-white">Cam Bergamot</span>
+                                    </div>
+                                    <div class="flex flex-col items-center text-center p-3 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-white/5 shadow-sm relative overflow-hidden">
+                                        <div class="absolute top-0 w-full h-0.5 bg-primary"></div>
+                                        <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
+                                            <span class="material-symbols-outlined text-lg">filter_vintage</span>
+                                        </div>
+                                        <span class="text-[10px] uppercase font-bold text-text-muted dark:text-gray-500 mb-1">Hương giữa</span>
+                                        <span class="text-xs font-semibold dark:text-white">Nhài Dạ</span>
+                                    </div>
+                                    <div class="flex flex-col items-center text-center p-3 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                                        <div class="size-8 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
+                                            <span class="material-symbols-outlined text-lg">forest</span>
+                                        </div>
+                                        <span class="text-[10px] uppercase font-bold text-text-muted dark:text-gray-500 mb-1">Hương cuối</span>
+                                        <span class="text-xs font-semibold dark:text-white">Đàn Hương</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Why it matches */}
+                            <div class="w-full mb-8 animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+                                <h2 class="text-xs font-bold uppercase tracking-widest text-text-muted dark:text-gray-400 mb-3 border-b border-gray-200 dark:border-gray-700 pb-2">Tại sao phù hợp với bạn</h2>
+                                <p class="text-sm text-text-main/80 dark:text-white/80 leading-relaxed font-sans bg-surface-light dark:bg-surface-dark p-4 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm">
+                                    Dựa trên sở thích của bạn về các nốt hương ấm áp và không gian sử dụng vào buổi tối, <span class="font-bold text-primary">Midnight Bloom</span> là sự lựa chọn hoàn hảo. Sự kết hợp giữa hoa nhài quyến rũ và gỗ đàn hương trầm ấm phản ánh chính xác phong cách thanh lịch, bí ẩn mà bạn đang tìm kiếm.
+                                </p>
+                            </div>
+
+                            {/* Similar Suggestions */}
+                            <div class="w-full mb-6 animate-fade-in-up" style={{animationDelay: '0.3s'}}>
+                                <h2 class="text-xs font-bold uppercase tracking-widest text-text-muted dark:text-gray-400 mb-4 border-b border-gray-200 dark:border-gray-700 pb-2">Gợi ý tương tự</h2>
+                                <div class="flex flex-col gap-3">
+                                    <div onClick={() => navigate('/product/1')} class="flex items-center gap-4 p-3 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-white/5 cursor-pointer hover:border-primary/30 transition-colors shadow-sm">
+                                        <div class="w-16 h-16 rounded-lg bg-gray-100 dark:bg-gray-800 bg-cover bg-center shrink-0" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuA2Z2Rovi3M9oS6kRuF3h8cSVZUteAN5Y7tk5EaebFRCfm1TNnSo7PoNeAUDZ9Wh4yLMnGmLTMRLACDLibd8jnSDSqkkBYWtl8zEEwZz47MV3f_drnAB6PsYwjiK3TkTgg5f_1P71KrQyHNdGdpXvjY7rDe90tnGDn2FfQeh-HYzzik0aaM9HJYweBAxeIJxy_BycgfdFNJ0ieXHfhrDDJO1Ga2hJop0p5yqZ06OeFLiMLVoAheqURpiIUihAWHVNY8YMZ9hTaBdNo")'}}></div>
+                                        <div class="flex-1 min-w-0">
+                                            <h4 class="font-bold text-text-main dark:text-white text-sm truncate">Santal Nuit</h4>
+                                            <p class="text-xs text-text-muted truncate">Hương Gỗ & Xạ Hương</p>
+                                            <div class="flex items-center gap-1 mt-1">
+                                                <span class="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">Match 85%</span>
+                                            </div>
+                                        </div>
+                                        <span class="material-symbols-outlined text-gray-400">chevron_right</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </main>
+                        <div class="absolute bottom-0 left-0 w-full px-6 pb-6 pt-12 bg-gradient-to-t from-background-light via-background-light to-transparent dark:from-background-dark dark:via-background-dark dark:to-transparent z-20">
+                            <div class="flex flex-col gap-3">
+                                <div class="flex gap-4">
+                                    <button onClick={() => navigate('/cart')} class="flex-1 bg-primary hover:bg-primary-hover text-surface-dark dark:text-background-dark font-display font-bold text-lg py-4 rounded-full shadow-glow transform active:scale-95 transition-all flex items-center justify-center gap-2">
+                                        <span>Thêm Vào Giỏ</span>
+                                        <span class="material-icons-outlined text-xl">shopping_bag</span>
+                                    </button>
+                                </div>
+                                <button onClick={handleSave} class="w-full py-3 rounded-full border border-primary/40 dark:border-primary/30 text-primary-dark dark:text-primary font-body font-semibold text-sm tracking-wide uppercase hover:bg-primary/5 dark:hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 backdrop-blur-sm">
+                                    <span class="material-icons-outlined text-lg">favorite</span>
+                                    <span>Lưu vào tài khoản</span>
+                                </button>
+                            </div>
+                        </div>
+                        {showToast && (
+                            <div class="fixed bottom-36 left-1/2 -translate-x-1/2 z-50 w-max max-w-[90%] animate-toast-in">
+                                <div class="bg-surface-dark/90 dark:bg-surface-light/95 backdrop-blur-md text-white dark:text-surface-dark px-6 py-3.5 rounded-full shadow-2xl flex items-center gap-3 border border-white/10 dark:border-black/5">
+                                    <span class="material-icons-outlined text-green-400 dark:text-green-600">check_circle</span>
+                                    <span class="text-sm font-medium">Đã lưu vào hồ sơ</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        const Profile = () => {
+            const navigate = useNavigate();
+            return (
+                <div class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark flex flex-col min-h-screen font-display">
+                    <div class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-sm border-b border-gray-100 dark:border-white/5">
+                        <div class="flex items-center p-4 pb-2 justify-between">
+                            <button onClick={() => navigate('/')} class="flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-text-main-light dark:text-text-main-dark">
+                                <span class="material-symbols-outlined">arrow_back</span>
+                            </button>
+                            <h2 class="text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center uppercase">Hồ Sơ Mùi Hương</h2>
+                            <button class="flex w-12 items-center justify-center shrink-0">
+                                <p class="text-primary text-base font-bold leading-normal tracking-[0.015em]">Sửa</p>
+                            </button>
+                        </div>
+                    </div>
+                    <main class="flex-1 overflow-y-auto pb-24">
+                        <div class="px-4 py-3 sticky top-[60px] z-40 bg-background-light dark:bg-background-dark">
+                            <div class="flex h-10 w-full items-center justify-center rounded-lg bg-[#f3f0e7] dark:bg-surface-dark p-1">
+                                <div class="flex cursor-pointer h-full grow items-center justify-center overflow-hidden rounded-md px-2 bg-surface-light dark:bg-[#3d3624] shadow-[0_1px_3px_rgba(0,0,0,0.1)] text-primary font-semibold">
+                                    <span class="truncate text-xs">Hồ Sơ Mùi Hương</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 pt-2 pb-6">
+                            <div class="relative overflow-hidden rounded-2xl bg-surface-light dark:bg-surface-dark shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-gray-100 dark:border-white/5">
+                                <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+                                <div class="relative p-6 flex flex-col items-center text-center">
+                                    <p class="text-primary text-xs font-bold tracking-widest uppercase mb-2">Scent DNA</p>
+                                    <h3 class="text-3xl font-extrabold tracking-tight mb-2 text-text-main-light dark:text-text-main-dark">Woody & Oriental</h3>
+                                    <p class="text-text-secondary-light dark:text-text-secondary-dark text-sm max-w-[280px] leading-relaxed mb-6">
+                                        You gravitate towards warm, grounding scents with hints of spice and deep resinous notes.
+                                    </p>
+                                    <div class="w-full max-w-[320px] aspect-[16/9] relative mb-4">
+                                        <svg fill="none" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="-3 0 478 150" width="100%" xmlns="http://www.w3.org/2000/svg">
+                                            <defs>
+                                                <linearGradient gradientUnits="userSpaceOnUse" id="chartGradient" x1="236" x2="236" y1="1" y2="149">
+                                                    <stop stopColor="#ecb613" stopOpacity="0.3"></stop>
+                                                    <stop offset="1" stopColor="#ecb613" stopOpacity="0"></stop>
+                                                </linearGradient>
+                                            </defs>
+                                            <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25V149H326.769H0V109Z" fill="url(#chartGradient)"></path>
+                                            <path d="M0 109C18.1538 109 18.1538 21 36.3077 21C54.4615 21 54.4615 41 72.6154 41C90.7692 41 90.7692 93 108.923 93C127.077 93 127.077 33 145.231 33C163.385 33 163.385 101 181.538 101C199.692 101 199.692 61 217.846 61C236 61 236 45 254.154 45C272.308 45 272.308 121 290.462 121C308.615 121 308.615 149 326.769 149C344.923 149 344.923 1 363.077 1C381.231 1 381.231 81 399.385 81C417.538 81 417.538 129 435.692 129C453.846 129 453.846 25 472 25" stroke="#ecb613" strokeLinecap="round" strokeWidth="2.5"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex justify-between w-full px-2">
+                                        <div class="flex flex-col items-center gap-1">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-primary/40"></div>
+                                            <p class="text-text-secondary-light dark:text-text-secondary-dark text-[10px] font-bold uppercase tracking-wider">Floral</p>
+                                        </div>
+                                        <div class="flex flex-col items-center gap-1">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+                                            <p class="text-primary text-[10px] font-bold uppercase tracking-wider">Woody</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-2 pt-2 flex items-center justify-between">
+                            <h3 class="text-text-main-light dark:text-text-main-dark text-lg font-bold leading-tight tracking-[-0.015em]">Kết Quả Quiz Đã Lưu</h3>
+                        </div>
+                        <div class="px-4 flex flex-col gap-3">
+                             <div onClick={() => navigate('/product/2')} class="group flex items-center gap-4 p-3 bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-transparent hover:border-primary/20 transition-all cursor-pointer">
+                                <div class="w-16 h-20 shrink-0 rounded-lg bg-gray-100 dark:bg-zinc-800 bg-cover bg-center overflow-hidden relative" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBQEUhM_t-0u9j2uIOXUCoLdROy-NOZwn7tKHPvi7aXNQ-i8meA7jfmiRjj11zd82tNjgnezokkF_LBNIBBO9jdsSWrfNabs7ql-uaFoFIw4RfgW0842_xJ4xx3YuyeaWkUX9tJ5wZSQIxtERsn76xvwt6Wviy6RP_SZfIP0sSKlX9hel7giWzgX2nVdRu427gnGriEkJJ2yK5EDyU5-m1VfDxsOHW6TR2slxO80-P9Qc0i8hQv2M3rMTNBXBV6BoA8r_1z24Ov0c4')"}}></div>
+                                <div class="flex-1 min-w-0 py-1">
+                                    <h4 class="text-base font-bold text-text-main-light dark:text-text-main-dark truncate leading-tight mb-1 group-hover:text-primary transition-colors">Midnight Bloom</h4>
+                                    <div class="flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-primary text-[16px]">stars</span>
+                                        <p class="text-sm font-semibold text-primary">96% Phù hợp</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                    <BottomNav />
+                </div>
+            );
+        };
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <Routes>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/shop" element={<ShopPage />} />
+                        <Route path="/product/:id" element={<ProductDetail />} />
+                        <Route path="/cart" element={<Cart />} />
+                        <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/confirmation" element={<Confirmation />} />
+                        <Route path="/quiz-intro" element={<QuizIntro />} />
+                        <Route path="/quiz-q1" element={<QuizQuestion />} />
+                        <Route path="/quiz-result" element={<QuizResult />} />
+                        <Route path="/profile" element={<Profile />} />
+                    </Routes>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

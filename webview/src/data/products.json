@@ -5,7 +5,7 @@
     "brand": "Salvatore Ferragamo",
     "price": 1850000,
     "image": "https://product.hstatic.net/1000340570/product/xanh_af50ca796bbc46d29a97fcd46636781b_grande.jpg",
-    "tags": [],
+    "tags": ["Sweet", "Romantic", "Party", "Mid"],
     "description": "Salvatore Ferragamo Signorina Misteriosa Fashion Edition",
     "link": "https://namperfume.net/products/salvatore-ferragamo-signorina-misteriosa-fashion-edition-2020",
     "source": "backup"
@@ -16,7 +16,7 @@
     "brand": "Salvatore Ferragamo",
     "price": 2300000,
     "image": "https://product.hstatic.net/1000340570/product/salvatore-ferragamo-savane-di-seta_6b523e58a7d049599b212d5dece5e95c_grande.jpg",
-    "tags": [],
+    "tags": ["Woody", "Office", "Daily", "Mid"],
     "description": "Salvatore Ferragamo Savane di Seta",
     "link": "https://namperfume.net/products/salvatore-ferragamo-savane-di-seta",
     "source": "backup"
@@ -27,9 +27,7 @@
     "brand": "Salvatore Ferragamo",
     "price": 2150000,
     "image": "https://product.hstatic.net/1000340570/product/ferr-intense_9018d9c3ea2440d3bbafec6413036503_grande.jpg",
-    "tags": [
-      "Musky"
-    ],
+    "tags": ["Musky", "Woody", "Office", "Mid", "Luxury"],
     "description": "Salvatore Ferragamo Intense Leather For Men",
     "link": "https://namperfume.net/products/ferragamo-intense-leather-by-salvatore-ferragamo-for-men",
     "source": "backup"
@@ -40,7 +38,7 @@
     "brand": "Salvatore Ferragamo",
     "price": 2300000,
     "image": "https://product.hstatic.net/1000340570/product/salvatore-ferragamo-giungle-di-seta_96e82a7c27d241b1a718bcbf9a495307_grande.jpg",
-    "tags": [],
+    "tags": ["Fresh", "Daily", "Office", "Mid"],
     "description": "Salvatore Ferragamo Giungle di Seta",
     "link": "https://namperfume.net/products/salvatore-ferragamo-giungle-di-seta",
     "source": "backup"

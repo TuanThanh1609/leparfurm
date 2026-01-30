@@ -49,34 +49,82 @@ const OUTPUT_FILE = 'products_women.csv';
                 await pPage.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
                 // Extract Data
+                // Extract Data
                 const data = await pPage.evaluate(() => {
-                    const title = document.querySelector('h1')?.textContent?.trim() || '';
-                    const price = document.querySelector('.product-price')?.textContent?.trim() || '';
-                    const image = document.querySelector('#product-featured-image')?.getAttribute('src') || document.querySelector('img')?.getAttribute('src') || '';
+                    // Strategy 1: JSON-LD (Preferred)
+                    const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+                    let ldProduct = null;
+
+                    for (const script of jsonLdScripts) {
+                        try {
+                            const json = JSON.parse(script.textContent || '{}');
+                            if (json['@type'] === 'Product') {
+                                ldProduct = json;
+                                break;
+                            }
+                        } catch (e) { }
+                    }
+
+                    let title = '', price = '0', image = '', description = '', category = '';
+
+                    if (ldProduct) {
+                        title = ldProduct.name || '';
+                        if (ldProduct.offers) {
+                            const offer = Array.isArray(ldProduct.offers) ? ldProduct.offers[0] : ldProduct.offers;
+                            price = offer.price ? String(offer.price) : '0';
+                        }
+                        if (ldProduct.image) {
+                            image = Array.isArray(ldProduct.image) ? ldProduct.image[0] : ldProduct.image;
+                        } else {
+                            const offer = Array.isArray(ldProduct.offers) ? ldProduct.offers[0] : ldProduct.offers;
+                            if (offer && offer.image) image = offer.image;
+                        }
+                        description = ldProduct.description || '';
+                    }
+
+                    // Strategy 2: DOM scraping (Fallback)
+                    if (!title) title = document.querySelector('h1')?.textContent?.trim() || '';
+                    if (price === '0') {
+                        price = document.querySelector('.product-price')?.textContent?.trim() ||
+                            document.querySelector('.current-price')?.textContent?.trim() || '';
+                    }
+                    // Sanitize Price
+                    if (price.length > 8 && price.endsWith('00') && parseInt(price) > 100000000) {
+                        price = String(parseInt(price) / 100);
+                    }
+
+                    if (!image || image.includes('icon-ring') || (!image.startsWith('http') && !image.startsWith('//'))) {
+                        const imgs = Array.from(document.querySelectorAll('img[src*="product"], img[src*="master"]')) as HTMLImageElement[];
+                        if (imgs.length > 0) {
+                            const bestImg = imgs.find(i => !i.src.includes('icon') && !i.src.includes('logo'));
+                            if (bestImg) image = bestImg.src;
+                        }
+                        if (!image) {
+                            image = document.querySelector('#product-featured-image')?.getAttribute('src') ||
+                                document.querySelector('img')?.getAttribute('src') || '';
+                        }
+                    }
 
                     // Breadcrumb for Category
                     const breadcrumbLinks = Array.from(document.querySelectorAll('.breadcrumb a'));
-                    // Usually 2nd or 3rd link is the collection. Logic: Take the one before the last (which is product Title)
-                    let category = '';
                     if (breadcrumbLinks.length >= 2) {
-                        category = breadcrumbLinks[breadcrumbLinks.length - 1].textContent?.trim() || ''; // Last link usually
-                        // If last text matches title, take previous. simple heuristic:
+                        category = breadcrumbLinks[breadcrumbLinks.length - 1].textContent?.trim() || '';
                         if (category === title || category === '') {
                             category = breadcrumbLinks[breadcrumbLinks.length - 2]?.textContent?.trim() || 'Nước hoa nữ';
                         }
                     } else {
-                        category = 'Nước hoa nữ'; // Fallback knowing the start URL
+                        category = 'Nước hoa nữ';
                     }
 
-                    // Description text (using #tab-detail as identified)
-                    const descEl = document.querySelector('#tab-detail');
-                    // Remove scripts/styles from desc text
-                    if (descEl) {
-                        const clones = descEl.cloneNode(true);
-                        const trash = (clones as Element).querySelectorAll('script, style');
-                        trash.forEach((t: Element) => t.remove());
+                    // Description text
+                    if (!description) {
+                        const descEl = document.querySelector('#tab-detail');
+                        if (descEl) {
+                            const clones = descEl.cloneNode(true) as HTMLElement;
+                            clones.querySelectorAll('script, style').forEach(el => el.remove());
+                            description = clones.textContent?.trim().replace(/\s+/g, ' ') || '';
+                        }
                     }
-                    const description = descEl ? descEl.textContent?.trim().replace(/\s+/g, ' ') : ''; // Optimize whitespace
 
                     return { title, price, category, image, description };
                 });

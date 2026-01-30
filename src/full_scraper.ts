@@ -97,24 +97,89 @@ interface Product {
                     await pPage.waitForTimeout(1000);
 
                     const data = await pPage.evaluate((catName) => {
-                        const title = document.querySelector('h1')?.textContent?.trim() || '';
-                        const priceRaw = document.querySelector('.product-price')?.textContent?.trim() || '0';
-                        const price = priceRaw.replace(/[^0-9]/g, '');
+                        // Strategy 1: JSON-LD (Preferred)
+                        const jsonLdScripts = document.querySelectorAll('script[type="application/ld+json"]');
+                        let ldProduct = null;
 
-                        let image = document.querySelector('#product-featured-image')?.getAttribute('src') ||
-                            document.querySelector('.product-image-feature')?.getAttribute('src') ||
-                            document.querySelector('img')?.getAttribute('src') || '';
+                        for (const script of jsonLdScripts) {
+                            try {
+                                const json = JSON.parse(script.textContent || '{}');
+                                if (json['@type'] === 'Product') {
+                                    ldProduct = json;
+                                    break;
+                                }
+                            } catch (e) { }
+                        }
+
+                        let title = '', price = '0', image = '', description = '', brand = '';
+
+                        if (ldProduct) {
+                            title = ldProduct.name || '';
+                            if (ldProduct.offers) {
+                                const offer = Array.isArray(ldProduct.offers) ? ldProduct.offers[0] : ldProduct.offers;
+                                price = offer.price ? String(offer.price) : '0';
+                            }
+                            if (ldProduct.image) {
+                                image = Array.isArray(ldProduct.image) ? ldProduct.image[0] : ldProduct.image;
+                            } else {
+                                // Fallback to offers image if main image is missing
+                                const offer = Array.isArray(ldProduct.offers) ? ldProduct.offers[0] : ldProduct.offers;
+                                if (offer && offer.image) image = offer.image;
+                            }
+                            description = ldProduct.description || '';
+                            brand = ldProduct.brand ? (ldProduct.brand.name || ldProduct.brand) : '';
+                        }
+
+                        // Strategy 2: DOM scraping (Fallback & Fill-in)
+                        if (!title) title = document.querySelector('h1')?.textContent?.trim() || '';
+
+                        if (price === '0') {
+                            const priceRaw = document.querySelector('.product-price')?.textContent?.trim() ||
+                                document.querySelector('.current-price')?.textContent?.trim() ||
+                                document.querySelector('#price-preview')?.textContent?.trim() || '0';
+                            price = priceRaw.replace(/[^0-9]/g, '');
+                        }
+
+                        // Sanitize Price
+                        if (price.length > 8 && price.endsWith('00') && parseInt(price) > 100000000) {
+                            // Heuristic: If > 100M and ends in 00, likely cents. Divide by 100.
+                            price = String(parseInt(price) / 100);
+                        }
+
+                        if (!image || image.includes('icon-ring.svg') || (!image.startsWith('http') && !image.startsWith('//'))) {
+                            // Try finding the largest image if not found via LD
+                            const imgs = Array.from(document.querySelectorAll('img[src*="product"], img[src*="master"]')) as HTMLImageElement[];
+                            if (imgs.length > 0) {
+                                // Sort by visual size if possible, or just take first non-icon
+                                const bestImg = imgs.find(i => !i.src.includes('icon') && !i.src.includes('logo'));
+                                if (bestImg) image = bestImg.src;
+                            }
+                            // Final fallback
+                            if (!image) image = document.querySelector('#product-featured-image')?.getAttribute('src') || '';
+                        }
+
                         if (image.startsWith('//')) image = `https:${image}`;
 
-                        const brand = document.querySelector('.pro-vendor')?.textContent?.replace('Thương hiệu', '').trim() || 'No Brand';
+                        // Ensure brand fallback
+                        if (!brand) brand = document.querySelector('.pro-vendor')?.textContent?.replace('Thương hiệu', '').trim() || 'No Brand';
 
-                        // Description
-                        const descEl = document.querySelector('#tab-detail');
-                        let description = '';
-                        if (descEl) {
-                            const clone = descEl.cloneNode(true) as HTMLElement;
-                            clone.querySelectorAll('script, style').forEach(el => el.remove());
-                            description = clone.textContent?.trim().replace(/\s+/g, ' ') || '';
+                        // Description fallback
+                        if (!description) {
+                            const descEl = document.querySelector('#tab-detail');
+                            if (descEl) {
+                                const clone = descEl.cloneNode(true) as HTMLElement;
+                                clone.querySelectorAll('script, style').forEach(el => el.remove());
+                                description = clone.textContent?.trim().replace(/\s+/g, ' ') || '';
+                            }
+                        }
+
+                        // Sanity Check on Price (prevent 3800000000 error if weird currency)
+                        if (price.length > 9) {
+                            // If > 9 digits (e.g. 1 billion VND is rare for perfume), check if it's crazy
+                            // 3,800,000 is 7 digits. 8 digits is 10M+. 9 digits is 100M+.
+                            // If it's 380000000 (9 digits), maybe it is bad? 
+                            // Realistically, leave it raw, but logic below in main script handles it? 
+                            // We return raw digits.
                         }
 
                         // ID from URL (last part)

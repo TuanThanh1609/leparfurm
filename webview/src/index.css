@@ -4,11 +4,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 @layer base {
   body {
-    @apply bg-brand-cream text-brand-dark font-sans antialiased;
+    @apply bg-background-light dark:bg-background-dark text-text-main dark:text-white font-display antialiased transition-colors duration-200;
   }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-serif text-brand-green;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-serif text-charcoal dark:text-white;
   }
 }
